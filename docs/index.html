@@ -1214,7 +1214,7 @@ function triggerEntry(){
     animating=true;
     ['nametag','controls','speed'].forEach(id=>document.getElementById(id).classList.remove('show'));
     document.getElementById('click-hint').classList.remove('show');
-    document.getElementById('portfolio-frame').src='index.html?from=intro3d';
+    document.getElementById('portfolio-frame').src='main.html?from=index';
     doZoom();
 }
 function easeInOutQuart(t){return t<.5?8*t*t*t*t:1-Math.pow(-2*t+2,4)/2;}
