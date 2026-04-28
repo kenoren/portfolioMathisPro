@@ -1,1277 +1,1435 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>MATHIS FOUREY — 開発者</title>
-<link rel="preconnect" href="https://fonts.googleapis.com"/>
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Noto+Serif+JP:wght@300;400;700;900&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet"/>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
-<style>
-:root {
-  --ink: #0d0c0a;
-  --paper: #f5f0e8;
-  --paper2: #ede8dc;
-  --paper3: #e0dbd0;
-  --accent: #d4001a;
-  --accent2: #ff6b35;
-  --gold: #c8a84b;
-  --muted: #6b6458;
-  --pale: #b8b0a0;
-  --border: rgba(13,12,10,.12);
-  --border2: rgba(13,12,10,.22);
-  --f-display: 'Bebas Neue', sans-serif;
-  --f-serif: 'Noto Serif JP', serif;
-  --f-mono: 'Space Mono', monospace;
-  --ease: cubic-bezier(.22,1,.36,1);
-}
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Mathis Fourey — Portfolio</title>
+    <style>
+        *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+        html,body{width:100%;height:100%;overflow:hidden;background:#0d0d1a;font-family:'Courier New',monospace}
+        #c{position:fixed;inset:0;z-index:1;display:block}
+        #portfolio-frame{position:fixed;inset:0;z-index:0;width:100%;height:100%;border:none;opacity:0;pointer-events:none;background:#080810;transition:opacity 1s ease}
+        #flash{position:fixed;inset:0;z-index:30;background:#c8ff3e;opacity:0;pointer-events:none;transition:opacity .2s ease}
+        #portal{position:fixed;inset:0;z-index:29;pointer-events:none;opacity:0;transition:opacity .35s ease;background:radial-gradient(circle at center,rgba(200,255,62,.25) 0%,rgba(62,255,200,.16) 22%,rgba(4,8,20,.92) 64%,rgba(0,0,0,1) 100%)}
+        
+        /* Custom cursor */
+        *{cursor:none}
+        #cur{position:fixed;pointer-events:none;z-index:200;width:12px;height:12px;border-radius:50%;background:#c8ff3e;transform:translate(-50%,-50%);mix-blend-mode:exclusion;transition:transform .15s ease,opacity .2s;top:0;left:0;box-shadow:0 0 12px rgba(200,255,62,.8)}
+        #cur-ring{position:fixed;pointer-events:none;z-index:199;width:40px;height:40px;border-radius:50%;border:1.5px solid rgba(200,255,62,.4);transform:translate(-50%,-50%);transition:width .25s cubic-bezier(.34,1.56,.64,1),height .25s cubic-bezier(.34,1.56,.64,1),border-color .3s,opacity .2s;top:0;left:0}
+        #cur.hover{transform:translate(-50%,-50%) scale(3);opacity:.6}
+        #cur-ring.hover{width:70px;height:70px;border-color:#c8ff3e;border-width:1px}
 
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-html{font-size:16px;scroll-behavior:smooth;-webkit-font-smoothing:antialiased}
-body{background:var(--paper);color:var(--ink);font-family:var(--f-mono);font-size:.8rem;line-height:1.7;overflow-x:hidden;cursor:crosshair}
-a{color:inherit;text-decoration:none}
-img{display:block;max-width:100%}
-button{cursor:crosshair;font-family:inherit;border:none;background:none}
-ul{list-style:none}
+        /* Loading */
+        #loading{position:fixed;inset:0;z-index:100;background:#0d0d1a;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2.8rem;transition:opacity 1.2s ease}
+        #loading.out{opacity:0;pointer-events:none}
+        .ld-logo{font-size:clamp(1.4rem,4vw,2.4rem);letter-spacing:.35em;text-transform:uppercase;color:#e0e0f0;text-align:center;font-weight:300}
+        .ld-logo strong{color:#c8ff3e;font-weight:700}
+        .ld-bar-wrap{width:320px;height:2px;background:rgba(255,255,255,.06);position:relative;overflow:hidden;border-radius:2px}
+        .ld-bar{height:100%;width:0;background:linear-gradient(90deg,#c8ff3e,#3effc8);transition:width .12s linear;border-radius:2px}
+        .ld-bar-wrap::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.5),transparent);animation:sh 1.8s infinite}
+        @keyframes sh{0%{transform:translateX(-100%)}100%{transform:translateX(300%)}}
+        .ld-txt{font-size:.6rem;letter-spacing:.22em;text-transform:uppercase;color:rgba(255,255,255,.2);min-height:1em}
+        .ld-dot{display:inline-block;animation:ldot 1.4s infinite}
+        .ld-dot:nth-child(2){animation-delay:.2s}.ld-dot:nth-child(3){animation-delay:.4s}
+        @keyframes ldot{0%,80%,100%{opacity:.2}40%{opacity:1}}
 
-/* ── SAKURA CANVAS ─────────────────────────────────────────── */
-#sakura-canvas{position:fixed;inset:0;z-index:1;pointer-events:none}
+        /* HUD nametag */
+        #nametag{position:fixed;top:2.5rem;left:2.8rem;z-index:10;opacity:0;pointer-events:none;transition:opacity 1.2s ease}
+        #nametag.show{opacity:1}
+        .nt1{font-size:.58rem;letter-spacing:.28em;text-transform:uppercase;color:rgba(255,255,255,.25);margin-bottom:.3rem}
+        .nt2{font-size:clamp(1.6rem,3.8vw,2.4rem);font-weight:800;letter-spacing:-.02em;color:#fff;line-height:1}
+        .nt2 em{color:#c8ff3e;font-style:normal}
+        .nt3{font-size:.6rem;letter-spacing:.14em;text-transform:uppercase;color:rgba(200,255,62,.5);margin-top:.35rem;font-weight:400}
+        .nt-status{display:flex;align-items:center;gap:.55rem;margin-top:.6rem}
+        .nt-dot{width:7px;height:7px;border-radius:50%;background:#c8ff3e;animation:blink 2.4s infinite;box-shadow:0 0 8px rgba(200,255,62,.6)}
+        @keyframes blink{0%,100%{opacity:1}50%{opacity:.15}}
+        .nt-status-txt{font-size:.58rem;letter-spacing:.12em;text-transform:uppercase;color:rgba(200,255,62,.55)}
 
-/* ── BG IMAGE ──────────────────────────────────────────────── */
-#bg-scene{
-  position:fixed;inset:0;z-index:0;
-  background:url('https://i.imgur.com/placeholder.jpg') center/cover no-repeat;
-  background-color:#d4c9b5;
-}
-#bg-scene::after{
-  content:'';position:absolute;inset:0;
-  background:linear-gradient(170deg,rgba(245,240,232,.88) 0%,rgba(245,240,232,.75) 40%,rgba(245,240,232,.82) 100%);
-}
+        /* Controls */
+        #controls{position:fixed;bottom:3rem;right:3.2rem;z-index:10;opacity:0;pointer-events:none;transition:opacity 1.2s ease;text-align:center}
+        #controls.show{opacity:1}
+        .ctrl-grid{display:flex;flex-direction:column;align-items:center;gap:.3rem}
+        .ctrl-row{display:flex;gap:.3rem}
+        .k{width:32px;height:32px;display:flex;align-items:center;justify-content:center;border:1.5px solid rgba(255,255,255,.1);border-radius:7px;background:rgba(255,255,255,.04);font-size:.62rem;color:rgba(255,255,255,.35);font-family:inherit;backdrop-filter:blur(4px)}
+        .ctrl-hint{font-size:.52rem;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.15);margin-top:.7rem}
 
-/* ── PROGRESS ───────────────────────────────────────────────── */
-#prog{position:fixed;top:0;left:0;height:2px;background:var(--accent);width:0;z-index:9999;transition:width .1s linear}
+        /* Speed */
+        #speed{position:fixed;top:2.5rem;right:3.2rem;z-index:10;opacity:0;pointer-events:none;transition:opacity 1.2s ease;text-align:right}
+        #speed.show{opacity:1}
+        .spv{font-size:2.4rem;font-weight:800;color:rgba(200,255,62,.8);line-height:1;letter-spacing:-.04em;font-variant-numeric:tabular-nums}
+        .spu{font-size:.52rem;letter-spacing:.2em;text-transform:uppercase;color:rgba(255,255,255,.18);margin-top:.1rem}
 
-/* ── NAV ────────────────────────────────────────────────────── */
-nav{
-  position:fixed;top:0;left:0;right:0;z-index:500;
-  display:flex;align-items:center;justify-content:space-between;
-  padding:.9rem 3rem;
-  border-bottom:1.5px solid var(--ink);
-  background:rgba(245,240,232,.92);
-  backdrop-filter:blur(12px);
-  mix-blend-mode:normal;
-}
-.nav-logo{
-  font-family:var(--f-display);font-size:1.6rem;letter-spacing:.12em;
-  color:var(--ink);display:flex;align-items:center;gap:.5rem;
-}
-.nav-logo span{color:var(--accent);font-size:.9rem;font-family:var(--f-serif);font-weight:300;writing-mode:vertical-rl;letter-spacing:.05em;opacity:.7;margin-top:2px}
-.nav-links{display:flex;gap:2.5rem;align-items:center}
-.nav-links a{
-  font-family:var(--f-display);font-size:1rem;letter-spacing:.18em;
-  color:var(--muted);transition:color .2s;
-}
-.nav-links a:hover,.nav-links a.active{color:var(--ink)}
-.nav-links a.active{text-decoration:underline;text-decoration-color:var(--accent);text-underline-offset:4px;text-decoration-thickness:2px}
-.nav-right{display:flex;align-items:center;gap:1rem}
-.burger{display:none;flex-direction:column;gap:5px;width:24px}
-.burger span{display:block;height:1.5px;background:var(--ink);border-radius:1px;transition:all .3s}
-.burger.open span:nth-child(1){transform:translateY(6.5px) rotate(45deg)}
-.burger.open span:nth-child(2){opacity:0}
-.burger.open span:nth-child(3){transform:translateY(-6.5px) rotate(-45deg)}
+        /* Click hint */
+        #click-hint{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:10;text-align:center;opacity:0;pointer-events:none;transition:opacity .4s ease}
+        #click-hint.show{opacity:1}
+        .ch-text{font-size:.78rem;letter-spacing:.32em;text-transform:uppercase;color:#c8ff3e;text-shadow:0 0 30px rgba(200,255,62,.8),0 0 60px rgba(200,255,62,.3);animation:pulse 1.8s ease-in-out infinite}
+        @keyframes pulse{0%,100%{opacity:1;text-shadow:0 0 30px rgba(200,255,62,.8),0 0 60px rgba(200,255,62,.3)}50%{opacity:.3;text-shadow:none}}
+        .ch-sub{font-size:.52rem;letter-spacing:.22em;text-transform:uppercase;color:rgba(255,255,255,.2);margin-top:.7rem}
 
-/* ── MOB MENU ────────────────────────────────────────────────── */
-.mob-menu{
-  display:none;position:fixed;top:63px;inset-x:0;
-  background:var(--paper);border-bottom:1.5px solid var(--ink);
-  z-index:499;padding:2rem 3rem;
-  flex-direction:column;gap:.5rem;
-}
-.mob-menu.open{display:flex}
-.mob-menu a{font-family:var(--f-display);font-size:2.5rem;letter-spacing:.1em;color:var(--muted);transition:color .2s;border-bottom:1px solid var(--border);padding:.4rem 0}
-.mob-menu a:hover{color:var(--accent)}
-
-/* ── SECTIONS ────────────────────────────────────────────────── */
-section{position:relative;z-index:2;display:none}
-section#home{display:block}
-.sec-enter{animation:secIn .55s var(--ease) forwards}
-@keyframes secIn{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
-
-/* ── MARQUEE STRIP ────────────────────────────────────────────── */
-.marquee-strip{
-  position:relative;z-index:3;overflow:hidden;
-  border-top:1.5px solid var(--ink);border-bottom:1.5px solid var(--ink);
-  background:var(--accent);padding:.55rem 0;
-  white-space:nowrap;
-}
-.marquee-inner{display:inline-flex;animation:marquee 18s linear infinite}
-.marquee-inner span{
-  font-family:var(--f-display);font-size:1rem;letter-spacing:.22em;color:#fff;
-  padding:0 3rem;
-}
-.marquee-inner span.sep{color:rgba(255,255,255,.4);padding:0;letter-spacing:0}
-@keyframes marquee{from{transform:translateX(0)}to{transform:translateX(-50%)}}
-
-/* ── HOME ─────────────────────────────────────────────────────── */
-#home{
-  min-height:100vh;
-  display:flex;flex-direction:column;
-  padding-top:63px;
-}
-.home-hero{
-  flex:1;display:grid;
-  grid-template-columns:1fr 1fr;
-  border-bottom:1.5px solid var(--ink);
-}
-.home-hero-left{
-  padding:5rem 4rem 5rem 5rem;
-  border-right:1.5px solid var(--ink);
-  display:flex;flex-direction:column;justify-content:space-between;
-}
-.home-hero-right{
-  display:flex;flex-direction:column;
-  justify-content:flex-end;
-  padding:0;
-  overflow:hidden;
-  position:relative;
-  background:var(--paper2);
-}
-.home-eyebrow{
-  font-family:var(--f-serif);font-size:.72rem;font-weight:300;
-  letter-spacing:.25em;text-transform:uppercase;color:var(--accent);
-  margin-bottom:2.5rem;display:flex;align-items:center;gap:.8rem;
-}
-.home-eyebrow::before{content:'';width:30px;height:1px;background:var(--accent)}
-.home-title-block{}
-.home-title{
-  font-family:var(--f-display);
-  font-size:clamp(5rem,10vw,9.5rem);
-  letter-spacing:.04em;
-  line-height:.88;
-  color:var(--ink);
-  margin-bottom:3.5rem;
-}
-.home-title .name-line{display:block}
-.home-title .name-line.accent{color:var(--accent)}
-.home-title .kanji{
-  font-family:var(--f-serif);font-weight:900;
-  font-size:clamp(3rem,6vw,6rem);
-  color:var(--paper3);
-  -webkit-text-stroke:1.5px var(--ink);
-  letter-spacing:.08em;
-}
-.home-subtitle{
-  font-family:var(--f-serif);font-size:.92rem;font-weight:300;
-  color:var(--muted);line-height:2.1;margin-bottom:3rem;max-width:420px;
-}
-.home-subtitle strong{color:var(--ink);font-weight:700}
-.home-btns{display:flex;gap:1rem;flex-wrap:wrap}
-.btn-primary{
-  display:inline-flex;align-items:center;gap:.6rem;
-  padding:.85rem 2.2rem;
-  background:var(--ink);color:var(--paper);
-  font-family:var(--f-display);font-size:1rem;letter-spacing:.18em;
-  transition:all .25s;border:1.5px solid var(--ink);
-}
-.btn-primary:hover{background:var(--accent);border-color:var(--accent);transform:translate(-2px,-2px);box-shadow:4px 4px 0 var(--ink)}
-.btn-ghost{
-  display:inline-flex;align-items:center;gap:.6rem;
-  padding:.85rem 2.2rem;
-  border:1.5px solid var(--ink);color:var(--ink);
-  font-family:var(--f-display);font-size:1rem;letter-spacing:.18em;
-  transition:all .25s;
-}
-.btn-ghost:hover{background:var(--ink);color:var(--paper);transform:translate(-2px,-2px);box-shadow:4px 4px 0 var(--accent)}
-
-/* Right column photo area */
-.photo-stamp{
-  position:absolute;top:4rem;left:50%;transform:translateX(-50%);
-  width:180px;text-align:center;
-  font-family:var(--f-serif);font-size:.65rem;font-weight:300;letter-spacing:.1em;
-  color:var(--muted);
-}
-.photo-frame{
-  width:180px;height:220px;border:1.5px solid var(--ink);
-  background:var(--paper3);overflow:hidden;
-  position:relative;margin-bottom:.5rem;
-}
-.photo-frame img{width:100%;height:100%;object-fit:cover;filter:sepia(.2) contrast(1.05)}
-.photo-placeholder{
-  width:100%;height:100%;display:flex;align-items:center;justify-content:center;
-  font-family:var(--f-display);font-size:2rem;letter-spacing:.1em;color:var(--pale);
-  background:repeating-linear-gradient(45deg,var(--paper2) 0,var(--paper2) 10px,var(--paper3) 10px,var(--paper3) 20px);
-}
-.home-data-col{
-  border-top:1.5px solid var(--ink);padding:2rem 4rem;
-  display:grid;grid-template-columns:repeat(3,1fr);
-  gap:0;
-}
-.data-item{padding:1.5rem 2rem 1.5rem 0;border-right:1.5px solid var(--ink)}
-.data-item:last-child{border-right:none;padding-left:2rem}
-.data-n{font-family:var(--f-display);font-size:3.5rem;color:var(--ink);line-height:1;letter-spacing:.02em}
-.data-l{font-family:var(--f-serif);font-size:.65rem;font-weight:300;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);margin-top:.3rem}
-
-/* Big jp text overlay in hero right */
-.jp-overlay{
-  position:absolute;bottom:-1rem;right:-1.5rem;
-  font-family:var(--f-serif);font-weight:900;font-size:14rem;
-  color:transparent;-webkit-text-stroke:1px rgba(13,12,10,.06);
-  line-height:1;letter-spacing:.02em;pointer-events:none;user-select:none;
-  writing-mode:vertical-rl;
-}
-
-/* ── GENERIC SECTION WRAPPER ──────────────────────────────────── */
-.sec-wrap{min-height:100vh;padding-top:63px}
-
-/* ── SECTION HEADER ───────────────────────────────────────────── */
-.sec-hd{
-  border-bottom:1.5px solid var(--ink);
-  padding:3.5rem 5rem;
-  display:grid;grid-template-columns:1fr 1fr;
-  align-items:end;gap:2rem;
-  background:var(--paper);
-}
-.sec-hd-num{
-  font-family:var(--f-display);font-size:7rem;color:transparent;
-  -webkit-text-stroke:1.5px var(--pale);line-height:1;
-  margin-bottom:-1rem;
-}
-.sec-hd-label{
-  font-family:var(--f-serif);font-size:.68rem;font-weight:300;letter-spacing:.3em;text-transform:uppercase;color:var(--accent);margin-bottom:.8rem;
-}
-.sec-title{
-  font-family:var(--f-display);font-size:clamp(3rem,6vw,6rem);letter-spacing:.05em;line-height:.92;color:var(--ink)
-}
-.sec-title em{color:var(--accent);font-style:normal}
-.sec-sub{
-  font-family:var(--f-serif);font-size:.82rem;font-weight:300;color:var(--muted);line-height:2;
-  border-left:2px solid var(--accent);padding-left:1.2rem;
-}
-
-/* ── CV ─────────────────────────────────────────────────────────── */
-.cv-grid{
-  display:grid;grid-template-columns:320px 1fr;
-  border-top:none;
-}
-.cv-sidebar{
-  border-right:1.5px solid var(--ink);
-  padding:3rem;
-  background:var(--paper2);
-}
-.cv-main{padding:3rem 4rem}
-.cv-block{margin-bottom:2.5rem}
-.cv-block-title{
-  font-family:var(--f-display);font-size:1.1rem;letter-spacing:.2em;
-  border-bottom:1.5px solid var(--ink);padding-bottom:.6rem;margin-bottom:1.2rem;
-}
-.cv-contact-item{
-  display:flex;align-items:center;gap:.8rem;
-  font-family:var(--f-serif);font-size:.75rem;font-weight:300;
-  color:var(--muted);margin-bottom:.6rem;
-}
-.cv-contact-item i{color:var(--accent);width:14px;flex-shrink:0}
-.cv-contact-item a{color:var(--muted);transition:color .2s}
-.cv-contact-item a:hover{color:var(--accent)}
-.sk-cat{margin-bottom:1.2rem}
-.sk-cat-name{font-family:var(--f-display);font-size:.75rem;letter-spacing:.2em;color:var(--muted);margin-bottom:.5rem}
-.sk-pills{display:flex;flex-wrap:wrap;gap:.3rem}
-.sk-pill{
-  font-family:var(--f-mono);font-size:.6rem;letter-spacing:.08em;
-  padding:.22rem .55rem;border:1px solid var(--ink);
-  color:var(--ink);background:transparent;transition:all .2s;
-}
-.sk-pill:hover{background:var(--ink);color:var(--paper)}
-.sk-pill.hi{background:var(--ink);color:var(--paper)}
-
-/* TL */
-.tl{position:relative;padding-left:1.8rem}
-.tl::before{content:'';position:absolute;left:.4rem;top:0;bottom:0;width:1px;background:var(--border2)}
-.tl-item{position:relative;padding-bottom:2.2rem}
-.tl-item:last-child{padding-bottom:0}
-.tl-dot{position:absolute;left:-1.8rem;top:.4rem;width:10px;height:10px;border:1.5px solid var(--ink);background:var(--paper);transform:translateX(-.1rem)}
-.tl-item:first-child .tl-dot{background:var(--accent);border-color:var(--accent)}
-.tl-date{font-family:var(--f-display);font-size:.75rem;letter-spacing:.15em;color:var(--accent);margin-bottom:.25rem}
-.tl-title{font-family:var(--f-serif);font-weight:700;font-size:.92rem;margin-bottom:.18rem}
-.tl-place{font-family:var(--f-mono);font-size:.65rem;color:var(--muted);margin-bottom:.5rem}
-.tl-desc{font-family:var(--f-serif);font-size:.78rem;font-weight:300;color:var(--muted);line-height:2}
-.tl-bullets{margin-top:.4rem}
-.tl-bullets li{font-family:var(--f-serif);font-size:.75rem;font-weight:300;color:var(--muted);padding-left:1rem;position:relative;line-height:1.9}
-.tl-bullets li::before{content:'—';position:absolute;left:0;color:var(--accent)}
-
-/* ── PROJECTS ──────────────────────────────────────────────────── */
-.proj-intro-row{
-  display:grid;grid-template-columns:1fr 380px;
-  border-bottom:1.5px solid var(--ink);
-  background:var(--paper);
-}
-.proj-intro-text{padding:3rem 5rem;border-right:1.5px solid var(--ink)}
-.proj-intro-side{padding:3rem;display:flex;flex-direction:column;justify-content:space-between}
-.proj-count-big{
-  font-family:var(--f-display);font-size:8rem;color:transparent;
-  -webkit-text-stroke:1.5px var(--border2);line-height:1;
-}
-.proj-count-label{font-family:var(--f-serif);font-size:.7rem;font-weight:300;letter-spacing:.2em;text-transform:uppercase;color:var(--muted)}
-
-/* Project card */
-.proj-list{border-top:1.5px solid var(--ink)}
-.proj-item{
-  display:grid;grid-template-columns:80px 1fr 380px;
-  border-bottom:1.5px solid var(--ink);
-  min-height:280px;
-  transition:background .25s;
-  position:relative;
-  background:var(--paper);
-}
-.proj-item:hover{background:var(--paper2)}
-.proj-num-col{
-  border-right:1.5px solid var(--ink);
-  display:flex;align-items:flex-start;justify-content:center;
-  padding-top:2rem;
-  font-family:var(--f-display);font-size:1.4rem;letter-spacing:.1em;color:var(--pale);
-}
-.proj-main{padding:2.5rem 3rem;border-right:1.5px solid var(--ink)}
-.proj-icon{
-  font-size:1.2rem;color:var(--accent);margin-bottom:1.2rem;
-}
-.proj-title{
-  font-family:var(--f-display);font-size:2.2rem;letter-spacing:.04em;
-  color:var(--ink);line-height:1;margin-bottom:.3rem;
-}
-.proj-ctx{font-family:var(--f-mono);font-size:.62rem;color:var(--muted);margin-bottom:1.2rem;letter-spacing:.05em}
-.proj-techs{display:flex;flex-wrap:wrap;gap:.3rem;margin-bottom:1.4rem}
-.proj-desc{font-family:var(--f-serif);font-size:.8rem;font-weight:300;color:var(--muted);line-height:2;margin-bottom:1.2rem}
-
-/* Proof/gallery col */
-.proj-gallery-col{padding:2.5rem;display:flex;flex-direction:column;gap:.8rem}
-.gallery-label{
-  font-family:var(--f-display);font-size:.75rem;letter-spacing:.2em;color:var(--muted);margin-bottom:.4rem;
-}
-.gallery-grid{display:grid;grid-template-columns:1fr 1fr;gap:.5rem;flex:1}
-.gallery-thumb{
-  aspect-ratio:4/3;background:var(--paper2);border:1px solid var(--border2);
-  overflow:hidden;cursor:pointer;position:relative;
-  transition:all .25s;
-}
-.gallery-thumb:hover{border-color:var(--accent);transform:scale(1.02)}
-.gallery-thumb img{width:100%;height:100%;object-fit:cover;transition:transform .4s}
-.gallery-thumb:hover img{transform:scale(1.08)}
-.gallery-placeholder{
-  width:100%;height:100%;display:flex;align-items:center;justify-content:center;
-  flex-direction:column;gap:.4rem;
-  background:repeating-linear-gradient(135deg,var(--paper2) 0,var(--paper2) 8px,var(--paper3) 8px,var(--paper3) 16px);
-  color:var(--pale);font-family:var(--f-display);font-size:.7rem;letter-spacing:.12em;
-  transition:background .25s;
-}
-.gallery-thumb:hover .gallery-placeholder{background:repeating-linear-gradient(135deg,var(--paper3) 0,var(--paper3) 8px,rgba(212,0,26,.08) 8px,rgba(212,0,26,.08) 16px)}
-.gallery-placeholder i{font-size:1.2rem;opacity:.4}
-.gallery-add{
-  text-align:center;padding:.6rem;border:1px dashed var(--border2);
-  font-family:var(--f-mono);font-size:.6rem;letter-spacing:.1em;color:var(--pale);
-  transition:all .25s;
-}
-.gallery-add:hover{border-color:var(--accent);color:var(--accent)}
-
-.proj-links-row{display:flex;gap:.5rem;margin-top:auto;padding-top:1rem}
-.plink{
-  display:inline-flex;align-items:center;gap:.4rem;
-  padding:.4rem 1rem;border:1px solid var(--ink);
-  font-family:var(--f-mono);font-size:.62rem;letter-spacing:.1em;
-  color:var(--ink);transition:all .2s;
-}
-.plink:hover{background:var(--ink);color:var(--paper)}
-
-/* ── LIGHTBOX ────────────────────────────────────────────────────── */
-#lightbox{
-  display:none;position:fixed;inset:0;z-index:8000;
-  background:rgba(13,12,10,.93);
-  align-items:center;justify-content:center;
-  flex-direction:column;gap:1rem;
-}
-#lightbox.open{display:flex;animation:lbIn .3s ease}
-@keyframes lbIn{from{opacity:0}to{opacity:1}}
-#lightbox img{
-  max-width:90vw;max-height:75vh;
-  border:2px solid rgba(245,240,232,.2);
-}
-#lightbox .lb-placeholder{
-  width:min(600px,90vw);aspect-ratio:16/9;
-  background:repeating-linear-gradient(135deg,rgba(245,240,232,.04) 0,rgba(245,240,232,.04) 10px,rgba(245,240,232,.08) 10px,rgba(245,240,232,.08) 20px);
-  border:1px solid rgba(245,240,232,.2);
-  display:flex;align-items:center;justify-content:center;
-  flex-direction:column;gap:1rem;color:rgba(245,240,232,.4);
-  font-family:var(--f-display);font-size:1.2rem;letter-spacing:.15em;
-}
-#lightbox .lb-placeholder i{font-size:2rem}
-#lb-close{
-  position:absolute;top:2rem;right:2rem;
-  font-family:var(--f-display);font-size:1.4rem;letter-spacing:.15em;
-  color:rgba(245,240,232,.6);transition:color .2s;padding:.5rem;
-}
-#lb-close:hover{color:#fff}
-#lb-caption{
-  font-family:var(--f-serif);font-size:.8rem;font-weight:300;
-  color:rgba(245,240,232,.6);letter-spacing:.1em;text-align:center;max-width:500px;
-}
-#lb-nav{display:flex;gap:1.5rem;align-items:center}
-#lb-nav button{
-  font-family:var(--f-display);font-size:1rem;letter-spacing:.15em;
-  color:rgba(245,240,232,.5);padding:.4rem .9rem;border:1px solid rgba(245,240,232,.15);
-  transition:all .2s;
-}
-#lb-nav button:hover{color:#fff;border-color:rgba(245,240,232,.4)}
-
-/* ── VEILLE ──────────────────────────────────────────────────────── */
-.veille-grid{
-  display:grid;grid-template-columns:repeat(3,1fr);
-  border-bottom:1.5px solid var(--ink);
-}
-.v-card{
-  padding:2.8rem 2.5rem;border-right:1.5px solid var(--ink);
-  background:var(--paper);transition:background .25s;
-  position:relative;overflow:hidden;
-}
-.v-card:last-child{border-right:none}
-.v-card:hover{background:var(--paper2)}
-.v-card-num{
-  font-family:var(--f-display);font-size:5rem;color:transparent;
-  -webkit-text-stroke:1px var(--paper3);
-  position:absolute;top:.5rem;right:1rem;line-height:1;pointer-events:none;
-}
-.v-icon{font-size:1.4rem;color:var(--accent);margin-bottom:1.2rem}
-.v-title{font-family:var(--f-display);font-size:1.6rem;letter-spacing:.04em;margin-bottom:.8rem;line-height:1}
-.v-desc{font-family:var(--f-serif);font-size:.78rem;font-weight:300;color:var(--muted);line-height:2;margin-bottom:1rem}
-.v-sources li{
-  font-family:var(--f-mono);font-size:.65rem;color:var(--muted);
-  padding:.3rem 0;border-bottom:1px solid var(--border);
-  display:flex;align-items:center;gap:.5rem;
-}
-.v-sources li:last-child{border-bottom:none}
-.v-sources li::before{content:'→';color:var(--accent);font-size:.7rem}
-
-.synth-section{padding:4rem 5rem;border-top:1.5px solid var(--ink)}
-.synth-section-title{
-  font-family:var(--f-display);font-size:1rem;letter-spacing:.25em;
-  color:var(--muted);margin-bottom:2rem;
-}
-.synth-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem}
-.synth-card{
-  border:1.5px solid var(--ink);padding:1.8rem;
-  position:relative;background:var(--paper);
-  transition:all .25s;
-}
-.synth-card:hover{background:var(--ink);color:var(--paper)}
-.synth-card:hover h4{color:var(--accent)}
-.synth-card:hover p{color:rgba(245,240,232,.7)}
-.synth-card::before{
-  content:attr(data-num);
-  font-family:var(--f-display);font-size:4rem;color:var(--paper2);
-  position:absolute;top:.3rem;right:.8rem;line-height:1;
-  transition:color .25s;
-}
-.synth-card:hover::before{color:rgba(245,240,232,.1)}
-h4.synth-title{font-family:var(--f-serif);font-weight:700;font-size:.9rem;margin-bottom:.6rem;position:relative;z-index:1;transition:color .25s}
-.synth-card p{font-family:var(--f-serif);font-size:.75rem;font-weight:300;color:var(--muted);line-height:2;position:relative;z-index:1;transition:color .25s}
-
-/* ── CONTACT ─────────────────────────────────────────────────────── */
-.contact-main{
-  display:grid;grid-template-columns:1fr 1fr;
-  min-height:calc(100vh - 63px);
-}
-.contact-left{
-  padding:5rem;border-right:1.5px solid var(--ink);
-  display:flex;flex-direction:column;justify-content:space-between;
-}
-.contact-headline{
-  font-family:var(--f-display);
-  font-size:clamp(4rem,7vw,7.5rem);
-  letter-spacing:.03em;line-height:.88;
-  margin-bottom:2rem;
-}
-.contact-headline em{color:var(--accent);font-style:normal}
-.contact-sub{font-family:var(--f-serif);font-size:.85rem;font-weight:300;color:var(--muted);line-height:2.1;margin-bottom:3rem;max-width:400px}
-.c-links{display:flex;flex-direction:column;gap:0}
-.c-link{
-  display:flex;align-items:center;gap:1.2rem;
-  padding:1.2rem 0;border-bottom:1px solid var(--border2);
-  transition:all .25s;position:relative;overflow:hidden;
-}
-.c-link::before{
-  content:'';position:absolute;left:-100%;top:0;bottom:0;width:100%;
-  background:var(--paper2);transition:left .3s var(--ease);z-index:-1;
-}
-.c-link:hover::before{left:0}
-.c-link:hover{padding-left:.5rem}
-.c-link:last-child{border-bottom:none}
-.c-icon{width:36px;height:36px;border:1.5px solid var(--ink);display:flex;align-items:center;justify-content:center;color:var(--accent);font-size:.85rem;flex-shrink:0;transition:all .25s}
-.c-link:hover .c-icon{background:var(--ink);color:var(--paper)}
-.c-info{flex:1}
-.c-lbl{font-family:var(--f-display);font-size:.7rem;letter-spacing:.2em;color:var(--muted)}
-.c-val{font-family:var(--f-serif);font-size:.85rem;font-weight:700;margin-top:.1rem}
-.c-arr{color:var(--pale);transition:all .25s}
-.c-link:hover .c-arr{transform:translateX(4px);color:var(--accent)}
-
-/* Form */
-.contact-right{padding:5rem;background:var(--paper2)}
-.contact-form-title{
-  font-family:var(--f-display);font-size:2.2rem;letter-spacing:.06em;
-  margin-bottom:2rem;color:var(--ink);
-}
-.ff{margin-bottom:1.2rem}
-.ff label{
-  display:block;font-family:var(--f-display);font-size:.8rem;letter-spacing:.18em;
-  color:var(--muted);margin-bottom:.5rem;
-}
-.ff input,.ff textarea{
-  width:100%;padding:.85rem 1rem;
-  background:var(--paper);border:1.5px solid var(--ink);
-  color:var(--ink);font-family:var(--f-mono);font-size:.78rem;
-  outline:none;resize:none;transition:border-color .2s;
-  border-radius:0;
-}
-.ff input:focus,.ff textarea:focus{border-color:var(--accent)}
-.ff input::placeholder,.ff textarea::placeholder{color:var(--pale)}
-.ff textarea{height:110px}
-.f-submit{
-  width:100%;padding:1rem;background:var(--ink);color:var(--paper);
-  font-family:var(--f-display);font-size:1.2rem;letter-spacing:.2em;
-  border:1.5px solid var(--ink);transition:all .25s;margin-top:.3rem;
-}
-.f-submit:hover{background:var(--accent);border-color:var(--accent);transform:translate(-2px,-2px);box-shadow:4px 4px 0 var(--ink)}
-
-/* ── FOOTER ──────────────────────────────────────────────────────── */
-footer{
-  position:relative;z-index:2;
-  border-top:1.5px solid var(--ink);
-  padding:1.5rem 5rem;
-  display:flex;align-items:center;justify-content:space-between;
-  background:var(--ink);color:var(--paper);
-}
-.footer-copy{font-family:var(--f-mono);font-size:.65rem;letter-spacing:.1em;color:rgba(245,240,232,.5)}
-.footer-copy span{color:var(--accent)}
-.footer-links{display:flex;gap:1.5rem}
-.footer-links a{color:rgba(245,240,232,.5);font-size:.9rem;transition:color .2s}
-.footer-links a:hover{color:var(--accent)}
-.footer-jp{font-family:var(--f-serif);font-size:.65rem;color:rgba(245,240,232,.3);letter-spacing:.15em}
-
-/* ── FI ANIM ──────────────────────────────────────────────────────── */
-.fi{opacity:0;animation:fi .7s var(--ease) forwards}
-@keyframes fi{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
-.fi:nth-child(1){animation-delay:.04s}.fi:nth-child(2){animation-delay:.1s}
-.fi:nth-child(3){animation-delay:.16s}.fi:nth-child(4){animation-delay:.22s}
-.fi:nth-child(5){animation-delay:.28s}.fi:nth-child(6){animation-delay:.34s}
-.fi:nth-child(7){animation-delay:.4s}.fi:nth-child(8){animation-delay:.46s}
-
-/* ── RESPONSIVE ───────────────────────────────────────────────────── */
-@media(max-width:1100px){
-  .home-hero{grid-template-columns:1fr}
-  .home-hero-right{display:none}
-  .home-hero-left{padding:4rem 3rem}
-  .cv-grid{grid-template-columns:1fr}
-  .cv-sidebar{border-right:none;border-bottom:1.5px solid var(--ink)}
-  .proj-item{grid-template-columns:60px 1fr}
-  .proj-gallery-col{display:none}
-  .veille-grid{grid-template-columns:1fr}
-  .v-card{border-right:none;border-bottom:1.5px solid var(--ink)}
-  .synth-grid{grid-template-columns:1fr 1fr}
-  .contact-main{grid-template-columns:1fr}
-  .contact-left{border-right:none;border-bottom:1.5px solid var(--ink)}
-  .sec-hd{grid-template-columns:1fr;padding:3rem}
-  nav{padding:.9rem 2rem}
-  .proj-intro-row{grid-template-columns:1fr}
-  .proj-intro-side{display:none}
-}
-@media(max-width:768px){
-  nav{padding:.8rem 1.2rem}
-  .nav-links{display:none}
-  .burger{display:flex}
-  .sec-hd{padding:2rem 1.5rem}
-  .home-hero-left{padding:3rem 1.5rem}
-  .cv-sidebar{padding:2rem 1.5rem}
-  .cv-main{padding:2rem 1.5rem}
-  .proj-main{padding:1.5rem}
-  .proj-num-col{display:none}
-  .proj-item{grid-template-columns:1fr}
-  .synth-grid{grid-template-columns:1fr}
-  .veille-grid{grid-template-columns:1fr}
-  .contact-left,.contact-right{padding:2.5rem 1.5rem}
-  .synth-section{padding:2.5rem 1.5rem}
-  footer{padding:1.5rem;flex-direction:column;gap:1rem;text-align:center}
-  .footer-jp{display:none}
-  .home-data-col{grid-template-columns:1fr;padding:1.5rem}
-  .data-item{border-right:none;border-bottom:1px solid var(--border);padding:1rem 0}
-  .data-item:last-child{border-bottom:none}
-}
-@media print{
-  section{display:block!important}
-  #sakura-canvas,#bg-scene,nav{display:none}
-}
-</style>
+        /* Vignette */
+        #vig{position:fixed;inset:0;z-index:2;pointer-events:none;background:radial-gradient(ellipse 80% 80% at 50% 50%,transparent 40%,rgba(0,0,0,.6) 100%)}
+        #corners{position:fixed;inset:0;z-index:5;pointer-events:none}
+        .corner{position:absolute;width:44px;height:44px;border-color:rgba(200,255,62,.18);border-style:solid}
+        .corner.tl{top:1.6rem;left:1.6rem;border-width:1px 0 0 1px}
+        .corner.tr{top:1.6rem;right:1.6rem;border-width:1px 1px 0 0}
+        .corner.bl{bottom:1.6rem;left:1.6rem;border-width:0 0 1px 1px}
+        .corner.br{bottom:1.6rem;right:1.6rem;border-width:0 1px 1px 0}
+    </style>
 </head>
 <body>
-
-<div id="bg-scene"></div>
-<canvas id="sakura-canvas"></canvas>
-<div id="prog"></div>
-
-<!-- LIGHTBOX -->
-<div id="lightbox">
-  <button id="lb-close" onclick="closeLightbox()">✕ FERMER</button>
-  <div class="lb-placeholder">
-    <i class="fa-solid fa-image"></i>
-    <span>PREUVE / CAPTURE D'ÉCRAN</span>
-  </div>
-  <div id="lb-caption">Capture du projet — à remplacer par une vraie image</div>
-  <div id="lb-nav">
-    <button onclick="lbPrev()">← PREV</button>
-    <button onclick="lbNext()">NEXT →</button>
-  </div>
+<canvas id="c"></canvas>
+<iframe id="portfolio-frame" src="about:blank" title="Portfolio"></iframe>
+<div id="flash"></div>
+<div id="portal"></div>
+<div id="cur"></div>
+<div id="cur-ring"></div>
+<div id="vig"></div>
+<div id="corners">
+    <div class="corner tl"></div><div class="corner tr"></div>
+    <div class="corner bl"></div><div class="corner br"></div>
 </div>
 
-<!-- NAV -->
-<nav id="main-nav">
-  <div class="nav-logo">
-    MF
-    <span>開発者</span>
-  </div>
-  <ul class="nav-links">
-    <li><a href="#" onclick="return showSec('home')" class="active" data-sec="home">Accueil</a></li>
-    <li><a href="#" onclick="return showSec('cv')" data-sec="cv">CV</a></li>
-    <li><a href="#" onclick="return showSec('realisations')" data-sec="realisations">Projets</a></li>
-    <li><a href="#" onclick="return showSec('veille')" data-sec="veille">Veille</a></li>
-    <li><a href="#" onclick="return showSec('contact')" data-sec="contact">Contact</a></li>
-  </ul>
-  <div class="nav-right">
-    <button class="burger" id="burger">
-      <span></span><span></span><span></span>
-    </button>
-  </div>
-</nav>
-<div class="mob-menu" id="mob-menu">
-  <a href="#" onclick="showSec('home');closeMob()">Accueil</a>
-  <a href="#" onclick="showSec('cv');closeMob()">CV</a>
-  <a href="#" onclick="showSec('realisations');closeMob()">Projets</a>
-  <a href="#" onclick="showSec('veille');closeMob()">Veille</a>
-  <a href="#" onclick="showSec('contact');closeMob()">Contact</a>
+<div id="loading">
+    <div><div class="ld-logo">Mathis <strong>Fourey</strong></div></div>
+    <div class="ld-bar-wrap"><div class="ld-bar" id="ld-bar"></div></div>
+    <div class="ld-txt" id="ld-msg">Initialisation<span class="ld-dot">.</span><span class="ld-dot">.</span><span class="ld-dot">.</span></div>
 </div>
 
-<!-- ══ HOME ══════════════════════════════════════════════════════════ -->
-<section id="home">
-  <div class="home-hero">
-    <div class="home-hero-left">
-      <div>
-        <div class="home-eyebrow fi">Disponible en alternance 2026–2027</div>
-        <h1 class="home-title">
-          <span class="name-line fi">MATHIS</span>
-          <span class="name-line fi">FOU<span style="color:var(--accent)">REY</span></span>
-          <span class="name-line kanji fi">開発者</span>
-        </h1>
-        <p class="home-subtitle fi">
-          Étudiant en <strong>Licence Web &amp; Mobile</strong> à Caen.<br>
-          Je construis des applications pensées, utiles,<br>
-          et bien fichues — du backend au pixel près.
-        </p>
-        <div class="home-btns fi">
-          <a class="btn-primary" href="#" onclick="return showSec('realisations')">
-            <i class="fa-solid fa-code"></i>&nbsp; Voir mes projets
-          </a>
-          <a class="btn-ghost" href="#" onclick="return showSec('contact')">
-            Me contacter &nbsp;<i class="fa-solid fa-arrow-right"></i>
-          </a>
-        </div>
-      </div>
-      <div class="home-data-col fi">
-        <div class="data-item">
-          <div class="data-n" data-count="3">0</div>
-          <div class="data-l">Projets réalisés</div>
-        </div>
-        <div class="data-item" style="padding-left:2rem">
-          <div class="data-n" data-count="2" data-suffix="ans">0</div>
-          <div class="data-l">BTS SIO SLAM</div>
-        </div>
-        <div class="data-item" style="padding-left:2rem">
-          <div class="data-n" data-count="1">0</div>
-          <div class="data-l">Stage · SEO Jungle</div>
-        </div>
-      </div>
-    </div>
-    <div class="home-hero-right fi">
-      <div class="jp-overlay">写真</div>
-      <div class="photo-stamp" style="top:3rem">
-        <div class="photo-frame">
-          <img src="photo.png" alt="Mathis Fourey" onerror="this.parentNode.innerHTML='<div class=photo-placeholder>MF</div>'"/>
-        </div>
-        MATHIS FOUREY · 2025
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- MARQUEE -->
-<div class="marquee-strip" style="z-index:2;position:relative">
-  <div class="marquee-inner">
-    <span>FULLSTACK</span><span class="sep">✦</span>
-    <span>DÉVELOPPEUR</span><span class="sep">✦</span>
-    <span>WEB &amp; MOBILE</span><span class="sep">✦</span>
-    <span>BTS SIO SLAM</span><span class="sep">✦</span>
-    <span>CAEN · NORMANDIE</span><span class="sep">✦</span>
-    <span>ALTERNANCE 2026</span><span class="sep">✦</span>
-    <span>JAVASCRIPT</span><span class="sep">✦</span>
-    <span>PHP · JAVA · PYTHON</span><span class="sep">✦</span>
-    <!-- duplicate for seamless loop -->
-    <span>FULLSTACK</span><span class="sep">✦</span>
-    <span>DÉVELOPPEUR</span><span class="sep">✦</span>
-    <span>WEB &amp; MOBILE</span><span class="sep">✦</span>
-    <span>BTS SIO SLAM</span><span class="sep">✦</span>
-    <span>CAEN · NORMANDIE</span><span class="sep">✦</span>
-    <span>ALTERNANCE 2026</span><span class="sep">✦</span>
-    <span>JAVASCRIPT</span><span class="sep">✦</span>
-    <span>PHP · JAVA · PYTHON</span><span class="sep">✦</span>
-  </div>
+<div id="nametag">
+    <div class="nt1">Portfolio de</div>
+    <div class="nt2">Mathis <em>Fourey</em></div>
+    <div class="nt3">Développeur Fullstack · Licence Web &amp; Mobile</div>
+    <div class="nt-status"><div class="nt-dot"></div><span class="nt-status-txt">Disponible en alternance 2026</span></div>
 </div>
 
-<!-- ══ CV ════════════════════════════════════════════════════════════ -->
-<section id="cv">
-  <div class="sec-wrap">
-    <div class="sec-hd">
-      <div>
-        <div class="sec-hd-num fi">01</div>
-        <div class="sec-hd-label fi">Curriculum Vitæ</div>
-        <h2 class="sec-title fi">MON <em>PAR</em><br><em>COURS</em></h2>
-      </div>
-      <div class="sec-sub fi">Formation, compétences et expérience professionnelle. Du code au pixel, une vision complète du développement web moderne.</div>
+<div id="controls">
+    <div class="ctrl-grid">
+        <div class="ctrl-row"><div class="k">W</div></div>
+        <div class="ctrl-row"><div class="k">A</div><div class="k">S</div><div class="k">D</div></div>
     </div>
+    <div class="ctrl-hint">Orbiter la scène</div>
+</div>
 
-    <div class="cv-grid">
-      <div class="cv-sidebar">
-        <div class="cv-block fi">
-          <div class="cv-block-title">CONTACT</div>
-          <div class="cv-contact-item"><i class="fa-solid fa-envelope"></i> mathisfou@gmail.com</div>
-          <div class="cv-contact-item"><i class="fa-solid fa-phone"></i> 06 02 24 52 59</div>
-          <div class="cv-contact-item"><i class="fa-solid fa-location-dot"></i> Cesny-Bois-Halbout, 14220</div>
-          <div class="cv-contact-item"><i class="fa-brands fa-linkedin"></i><a href="https://www.linkedin.com/in/mathis-fourey-7348b0198/" target="_blank">mathis-fourey</a></div>
-          <div class="cv-contact-item"><i class="fa-brands fa-github"></i><a href="https://github.com/kenoren" target="_blank">kenoren</a></div>
-        </div>
+<div id="speed">
+    <div class="spv" id="spv">0.0</div>
+    <div class="spu">vitesse</div>
+</div>
 
-        <div class="cv-block fi">
-          <div class="cv-block-title">COMPÉTENCES</div>
-          <div class="sk-cat">
-            <div class="sk-cat-name">LANGAGES</div>
-            <div class="sk-pills">
-              <span class="sk-pill hi">JavaScript</span><span class="sk-pill hi">PHP</span>
-              <span class="sk-pill hi">HTML/CSS</span><span class="sk-pill">Python</span><span class="sk-pill">Java</span>
-            </div>
-          </div>
-          <div class="sk-cat">
-            <div class="sk-cat-name">FRAMEWORKS</div>
-            <div class="sk-pills">
-              <span class="sk-pill">Spring MVC</span><span class="sk-pill">Symfony</span>
-              <span class="sk-pill">React</span><span class="sk-pill">API REST</span>
-            </div>
-          </div>
-          <div class="sk-cat">
-            <div class="sk-cat-name">BASES DE DONNÉES</div>
-            <div class="sk-pills">
-              <span class="sk-pill">MySQL</span><span class="sk-pill">MariaDB</span>
-              <span class="sk-pill">H2</span><span class="sk-pill">MongoDB</span>
-              <span class="sk-pill">Cassandra</span>
-            </div>
-          </div>
-          <div class="sk-cat">
-            <div class="sk-cat-name">OUTILS</div>
-            <div class="sk-pills">
-              <span class="sk-pill">Tests unitaires</span><span class="sk-pill">CI/CD</span>
-              <span class="sk-pill">Chrome Ext.</span><span class="sk-pill">Git</span>
-            </div>
-          </div>
-        </div>
-      </div>
+<div id="click-hint">
+    <div class="ch-text">→ Cliquer pour entrer ←</div>
+    <div class="ch-sub">Cliquer sur l'écran</div>
+</div>
 
-      <div class="cv-main">
-        <div style="border-left:3px solid var(--accent);padding-left:1.5rem;margin-bottom:2.5rem;font-family:var(--f-serif);font-size:.85rem;font-weight:300;color:var(--muted);line-height:2.2" class="fi">
-          Étudiant en Licence Web &amp; Mobile, j'apprécie la dimension créative du développement : partir d'une idée, la structurer et lui donner vie. Je recherche une alternance pour mettre cette approche au service de projets concrets.
-        </div>
-
-        <div class="cv-block fi">
-          <div class="cv-block-title">EXPÉRIENCE</div>
-          <div class="tl">
-            <div class="tl-item">
-              <div class="tl-dot"></div>
-              <div class="tl-date">2025 – 2026 · 12 semaines</div>
-              <div class="tl-title">Développeur Junior — SEO Jungle</div>
-              <div class="tl-place">Caen · Stage</div>
-              <div class="tl-desc">Extension Chrome connectée à l'API SEO Jungle pour un accès rapide aux données SEO.</div>
-              <ul class="tl-bullets">
-                <li>JavaScript ES6+, React, HTML/CSS</li>
-                <li>Intégration API REST, Chrome Storage API</li>
-                <li>UI/UX, tests &amp; Chrome DevTools</li>
-              </ul>
-            </div>
-          </div>
-        </div>
-
-        <div class="cv-block fi">
-          <div class="cv-block-title">FORMATION</div>
-          <div class="tl">
-            <div class="tl-item">
-              <div class="tl-dot"></div>
-              <div class="tl-date">2026 – 2027</div>
-              <div class="tl-title">Licence STS Dev. Web &amp; Mobile</div>
-              <div class="tl-place">CaenSup</div>
-            </div>
-            <div class="tl-item">
-              <div class="tl-dot"></div>
-              <div class="tl-date">2024 – 2026</div>
-              <div class="tl-title">BTS SIO option SLAM</div>
-              <div class="tl-place">CaenSup</div>
-            </div>
-            <div class="tl-item">
-              <div class="tl-dot"></div>
-              <div class="tl-date">2020 – 2024</div>
-              <div class="tl-title">Licence Informatique (2ème année)</div>
-              <div class="tl-place">Université de Caen</div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ══ PROJETS ═══════════════════════════════════════════════════════ -->
-<section id="realisations">
-  <div class="sec-wrap">
-    <div class="sec-hd">
-      <div>
-        <div class="sec-hd-num fi">02</div>
-        <div class="sec-hd-label fi">Réalisations</div>
-        <h2 class="sec-title fi">MES <em>PRO</em><br><em>JETS</em></h2>
-      </div>
-      <div class="sec-sub fi">Projets développés en formation et en stage. Chaque carte contient une galerie de preuves — cliquez sur les vignettes pour zoomer.</div>
-    </div>
-
-    <div class="proj-list">
-
-      <!-- PROJECT 01 -->
-      <div class="proj-item fi">
-        <div class="proj-num-col">01</div>
-        <div class="proj-main">
-          <div class="proj-icon"><i class="fa-brands fa-chrome"></i></div>
-          <div class="proj-title">EXTENSION CHROME SEO JUNGLE</div>
-          <div class="proj-ctx">Stage · SEO Jungle, Caen · 2025/2026</div>
-          <div class="proj-techs">
-            <span class="sk-pill hi">JavaScript ES6+</span>
-            <span class="sk-pill">React</span>
-            <span class="sk-pill">API REST</span>
-            <span class="sk-pill">Chrome Storage</span>
-            <span class="sk-pill">Manifest V3</span>
-          </div>
-          <div class="proj-desc">
-            Outil permettant aux clients d'accéder rapidement à leurs données SEO sans l'interface principale — extension Chrome légère connectée à leur API. Gestion CORS et restrictions Chrome Extension API. Extension déployée en interne — métriques SEO accessibles en un clic depuis n'importe quelle page.
-          </div>
-          <div class="proj-links-row">
-            <a class="plink" href="https://github.com/kenoren" target="_blank"><i class="fa-brands fa-github"></i> GitHub</a>
-          </div>
-        </div>
-        <div class="proj-gallery-col">
-          <div class="gallery-label">GALERIE DE PREUVES</div>
-          <div class="gallery-grid">
-            <div class="gallery-thumb" onclick="openLightbox('Extension Chrome — Interface principale','ext-1')">
-              <div class="gallery-placeholder"><i class="fa-solid fa-image"></i>POPUP UI</div>
-            </div>
-            <div class="gallery-thumb" onclick="openLightbox('Extension Chrome — Données SEO','ext-2')">
-              <div class="gallery-placeholder"><i class="fa-solid fa-image"></i>DONNÉES SEO</div>
-            </div>
-            <div class="gallery-thumb" onclick="openLightbox('Extension Chrome — Options','ext-3')">
-              <div class="gallery-placeholder"><i class="fa-solid fa-image"></i>OPTIONS</div>
-            </div>
-            <div class="gallery-thumb" onclick="openLightbox('Extension Chrome — DevTools','ext-4')">
-              <div class="gallery-placeholder"><i class="fa-solid fa-image"></i>DEVTOOLS</div>
-            </div>
-          </div>
-          <div class="gallery-add">+ Glissez vos images ici ou remplacez les placeholders</div>
-        </div>
-      </div>
-
-      <!-- PROJECT 02 -->
-      <div class="proj-item fi">
-        <div class="proj-num-col">02</div>
-        <div class="proj-main">
-          <div class="proj-icon"><i class="fa-solid fa-file-code"></i></div>
-          <div class="proj-title">GÉNÉRATEUR DE PORTFOLIO / CV</div>
-          <div class="proj-ctx">BTS SIO 2ème année · 2025/2026</div>
-          <div class="proj-techs">
-            <span class="sk-pill hi">Java</span>
-            <span class="sk-pill">Spring Boot</span>
-            <span class="sk-pill">Spring MVC</span>
-            <span class="sk-pill">H2</span>
-            <span class="sk-pill">Maven</span>
-            <span class="sk-pill">API REST</span>
-          </div>
-          <div class="proj-desc">
-            Application web permettant de générer, personnaliser et exporter un portfolio ou CV en quelques étapes. Architecture MVC Spring Boot, base relationnelle H2, cycle de vie Java complet. Application présentée lors des épreuves BTS SIO SLAM.
-          </div>
-          <div class="proj-links-row">
-            <a class="plink" href="https://github.com/kenoren" target="_blank"><i class="fa-brands fa-github"></i> GitHub</a>
-          </div>
-        </div>
-        <div class="proj-gallery-col">
-          <div class="gallery-label">GALERIE DE PREUVES</div>
-          <div class="gallery-grid">
-            <div class="gallery-thumb" onclick="openLightbox('Portfolio Generator — Accueil','gen-1')">
-              <div class="gallery-placeholder"><i class="fa-solid fa-image"></i>ACCUEIL</div>
-            </div>
-            <div class="gallery-thumb" onclick="openLightbox('Portfolio Generator — Formulaire','gen-2')">
-              <div class="gallery-placeholder"><i class="fa-solid fa-image"></i>FORMULAIRE</div>
-            </div>
-            <div class="gallery-thumb" onclick="openLightbox('Portfolio Generator — Prévisualisation','gen-3')">
-              <div class="gallery-placeholder"><i class="fa-solid fa-image"></i>APERÇU</div>
-            </div>
-            <div class="gallery-thumb" onclick="openLightbox('Portfolio Generator — Export','gen-4')">
-              <div class="gallery-placeholder"><i class="fa-solid fa-image"></i>EXPORT</div>
-            </div>
-          </div>
-          <div class="gallery-add">+ Glissez vos images ici ou remplacez les placeholders</div>
-        </div>
-      </div>
-
-      <!-- PROJECT 03 -->
-      <div class="proj-item fi">
-        <div class="proj-num-col">03</div>
-        <div class="proj-main">
-          <div class="proj-icon"><i class="fa-solid fa-globe"></i></div>
-          <div class="proj-title">PORTFOLIO BTS 1ÈRE ANNÉE</div>
-          <div class="proj-ctx">BTS SIO 1ère année · 2024/2025</div>
-          <div class="proj-techs">
-            <span class="sk-pill hi">HTML</span>
-            <span class="sk-pill hi">CSS</span>
-            <span class="sk-pill hi">JavaScript</span>
-            <span class="sk-pill hi">PHP</span>
-            <span class="sk-pill">YAML</span>
-          </div>
-          <div class="proj-desc">
-            Premier projet web significatif. Portfolio personnel présentant le parcours et les compétences, entièrement codé à la main. HTML/CSS responsive, PHP côté serveur, manipulation DOM JS. Portfolio présenté aux épreuves de 1ère année — socle solide des fondamentaux web.
-          </div>
-          <div class="proj-links-row">
-            <a class="plink" href="https://github.com/kenoren" target="_blank"><i class="fa-brands fa-github"></i> GitHub</a>
-          </div>
-        </div>
-        <div class="proj-gallery-col">
-          <div class="gallery-label">GALERIE DE PREUVES</div>
-          <div class="gallery-grid">
-            <div class="gallery-thumb" onclick="openLightbox('Portfolio 1A — Page accueil','p1-1')">
-              <div class="gallery-placeholder"><i class="fa-solid fa-image"></i>ACCUEIL</div>
-            </div>
-            <div class="gallery-thumb" onclick="openLightbox('Portfolio 1A — Section projets','p1-2')">
-              <div class="gallery-placeholder"><i class="fa-solid fa-image"></i>PROJETS</div>
-            </div>
-            <div class="gallery-thumb" onclick="openLightbox('Portfolio 1A — Mobile','p1-3')">
-              <div class="gallery-placeholder"><i class="fa-solid fa-image"></i>MOBILE</div>
-            </div>
-            <div class="gallery-thumb" onclick="openLightbox('Portfolio 1A — Code source','p1-4')">
-              <div class="gallery-placeholder"><i class="fa-solid fa-image"></i>CODE</div>
-            </div>
-          </div>
-          <div class="gallery-add">+ Glissez vos images ici ou remplacez les placeholders</div>
-        </div>
-      </div>
-
-    </div>
-  </div>
-</section>
-
-<!-- ══ VEILLE ════════════════════════════════════════════════════════ -->
-<section id="veille">
-  <div class="sec-wrap">
-    <div class="sec-hd">
-      <div>
-        <div class="sec-hd-num fi">03</div>
-        <div class="sec-hd-label fi">Veille technologique</div>
-        <h2 class="sec-title fi">RES<em>TER</em><br><em>À JOUR</em></h2>
-      </div>
-      <div class="sec-sub fi">Comment je maintiens mes connaissances à jour — sources, outils, et synthèses des tendances qui façonnent le développement web en 2025.</div>
-    </div>
-
-    <div class="veille-grid">
-      <div class="v-card fi">
-        <div class="v-card-num">01</div>
-        <div class="v-icon"><i class="fa-brands fa-youtube"></i></div>
-        <div class="v-title">VIDEO & PODCASTS</div>
-        <p class="v-desc">Fireship, Traversy Media, The Primeagen pour les tendances tech au quotidien. Des formats courts qui vont à l'essentiel.</p>
-        <ul class="v-sources">
-          <li>Fireship</li>
-          <li>Traversy Media</li>
-          <li>The Primeagen</li>
-        </ul>
-      </div>
-      <div class="v-card fi">
-        <div class="v-card-num">02</div>
-        <div class="v-icon"><i class="fa-brands fa-github"></i></div>
-        <div class="v-title">GITHUB & DEV.TO</div>
-        <p class="v-desc">Trending repos, articles Dev.to et Hashnode pour rester dans la pratique et découvrir de nouveaux projets open source.</p>
-        <ul class="v-sources">
-          <li>GitHub Trending</li>
-          <li>Dev.to</li>
-          <li>Hashnode</li>
-        </ul>
-      </div>
-      <div class="v-card fi">
-        <div class="v-card-num">03</div>
-        <div class="v-icon"><i class="fa-solid fa-newspaper"></i></div>
-        <div class="v-title">DOCS & SÉCURITÉ</div>
-        <p class="v-desc">MDN pour la référence technique, OWASP pour la sécurité applicative, CNIL pour la conformité légale française.</p>
-        <ul class="v-sources">
-          <li>MDN Web Docs</li>
-          <li>OWASP Top 10</li>
-          <li>CNIL</li>
-        </ul>
-      </div>
-    </div>
-
-    <div class="synth-section">
-      <div class="synth-section-title fi">SYNTHÈSES &amp; ANALYSES</div>
-      <div class="synth-grid">
-        <div class="synth-card fi" data-num="I">
-          <h4 class="synth-title">Évolution des frameworks JS</h4>
-          <p>React reste dominant mais SvelteKit et Astro gagnent du terrain. La tendance va vers moins de JS côté client avec le SSR comme standard émergent.</p>
-        </div>
-        <div class="synth-card fi" data-num="II">
-          <h4 class="synth-title">REST vs GraphQL</h4>
-          <p>GraphQL offre plus de flexibilité mais ajoute de la complexité. Pour des projets de taille moyenne, REST bien documenté (OpenAPI/Swagger) reste la norme.</p>
-        </div>
-        <div class="synth-card fi" data-num="III">
-          <h4 class="synth-title">Sécurité web 2025</h4>
-          <p>Injections SQL et XSS restent les failles les plus courantes (OWASP Top 10). La montée des attaques sur les extensions Chrome pousse vers le manifest V3.</p>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ══ CONTACT ═══════════════════════════════════════════════════════ -->
-<section id="contact">
-  <div class="sec-wrap">
-    <div class="sec-hd">
-      <div>
-        <div class="sec-hd-num fi">04</div>
-        <div class="sec-hd-label fi">Prenons contact</div>
-        <h2 class="sec-title fi"><em>TRAVAIL</em><br><em>LONS</em></h2>
-      </div>
-      <div class="sec-sub fi">Je recherche une alternance pour 2026/2027. Vous avez un projet ou une opportunité ? Je suis disponible et motivé.</div>
-    </div>
-    <div class="contact-main">
-      <div class="contact-left">
-        <div>
-          <h2 class="contact-headline fi">ENSEMBLE<br><em>CRÉONS</em><br>QUELQUE<br>CHOSE.</h2>
-          <p class="contact-sub fi">Je recherche une alternance pour 2026/2027.<br>Vous avez un projet ou une opportunité ? Je suis disponible.</p>
-        </div>
-        <div class="c-links fi">
-          <a href="mailto:mathisfou@gmail.com" class="c-link">
-            <div class="c-icon"><i class="fa-solid fa-envelope"></i></div>
-            <div class="c-info"><div class="c-lbl">EMAIL</div><div class="c-val">mathisfou@gmail.com</div></div>
-            <i class="fa-solid fa-arrow-right c-arr"></i>
-          </a>
-          <a href="https://www.linkedin.com/in/mathis-fourey-7348b0198/" target="_blank" class="c-link">
-            <div class="c-icon"><i class="fa-brands fa-linkedin"></i></div>
-            <div class="c-info"><div class="c-lbl">LINKEDIN</div><div class="c-val">mathis-fourey</div></div>
-            <i class="fa-solid fa-arrow-right c-arr"></i>
-          </a>
-          <a href="https://github.com/kenoren" target="_blank" class="c-link">
-            <div class="c-icon"><i class="fa-brands fa-github"></i></div>
-            <div class="c-info"><div class="c-lbl">GITHUB</div><div class="c-val">kenoren</div></div>
-            <i class="fa-solid fa-arrow-right c-arr"></i>
-          </a>
-        </div>
-      </div>
-      <div class="contact-right">
-        <div class="contact-form-title fi">ENVOYER UN MESSAGE</div>
-        <div class="ff fi"><label>NOM</label><input type="text" placeholder="Votre nom"/></div>
-        <div class="ff fi"><label>EMAIL</label><input type="email" placeholder="votre@email.com"/></div>
-        <div class="ff fi"><label>MESSAGE</label><textarea placeholder="Votre message…"></textarea></div>
-        <button class="f-submit fi" onclick="handleForm(event)">ENVOYER &nbsp;<i class="fa-solid fa-paper-plane"></i></button>
-      </div>
-    </div>
-  </div>
-</section>
-
-<footer style="position:relative;z-index:2">
-  <span class="footer-copy">© 2025 <span>MATHIS FOUREY</span> — Portfolio BTS SIO SLAM</span>
-  <span class="footer-jp">ポートフォリオ · 開発者 · 2025年</span>
-  <div class="footer-links">
-    <a href="https://github.com/kenoren" target="_blank"><i class="fa-brands fa-github"></i></a>
-    <a href="https://www.linkedin.com/in/mathis-fourey-7348b0198/" target="_blank"><i class="fa-brands fa-linkedin"></i></a>
-    <a href="mailto:mathisfou@gmail.com"><i class="fa-solid fa-envelope"></i></a>
-  </div>
-</footer>
-
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
-/* ── SAKURA FALLING LEAVES ─────────────────────────────────── */
 (function(){
-  const cvs = document.getElementById('sakura-canvas');
-  const ctx = cvs.getContext('2d');
-  let W, H;
-  function resize(){ W = cvs.width = innerWidth; H = cvs.height = innerHeight }
-  resize();
-  window.addEventListener('resize', resize);
+'use strict';
 
-  const COLORS = ['#f5b8c8','#f2a0b8','#f8ccd8','#e8889a','#fad4de','#f0b0c0','#f7c4d0','#ea98b0'];
-  const N = 60;
-  const leaves = [];
+// ─── RENDERER ────────────────────────────────────────────────
+const canvas = document.getElementById('c');
+const renderer = new THREE.WebGLRenderer({canvas, antialias:true, powerPreference:'high-performance'});
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.setClearColor(0x0d0d1a, 1);
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.55;
 
-  function mkLeaf(){
-    return {
-      x: Math.random() * W,
-      y: Math.random() * -H * .5,
-      size: 5 + Math.random() * 9,
-      rot: Math.random() * Math.PI * 2,
-      rotSpd: (Math.random() - .5) * .06,
-      vx: (Math.random() - .5) * .9 + .4,
-      vy: .7 + Math.random() * 1.4,
-      swing: Math.random() * Math.PI * 2,
-      swingSpd: .012 + Math.random() * .018,
-      swingAmp: 0.9 + Math.random() * 1.2,
-      alpha: .55 + Math.random() * .45,
-      color: COLORS[Math.floor(Math.random() * COLORS.length)]
+const scene = new THREE.Scene();
+scene.fog = new THREE.FogExp2(0x12102a, 0.008);
+const camera = new THREE.PerspectiveCamera(50, window.innerWidth/window.innerHeight, 0.1, 200);
+camera.position.set(0, 5.5, 15);
+
+// ─── STATE ───────────────────────────────────────────────────
+let entered=false, animating=false;
+let camTheta=0, camPhi=0.3, camDist=15;
+const CAM_LOOK = new THREE.Vector3(0, 2.2, 0);
+const camLookCur = new THREE.Vector3(0, 2.2, 0);
+const keys={w:false,a:false,s:false,d:false};
+const mouse={x:0,y:0,down:false,lx:0,ly:0};
+let hovering=false;
+let clock=0;
+let speedDisplay=0;
+
+// ─── LOADING ─────────────────────────────────────────────────
+const msgs=['Préparation de la scène…','Construction du mobilier…','Éclairage & matériaux…','Personnage en place…','Touches finales…','Prêt !'];
+let pct=0;
+function load(to,mi){
+    pct=to;
+    document.getElementById('ld-bar').style.width=to+'%';
+    if(mi!=null) document.getElementById('ld-msg').innerHTML=msgs[mi]+'<span class="ld-dot">.</span><span class="ld-dot">.</span><span class="ld-dot">.</span>';
+    if(to>=100) setTimeout(finishLoad,500);
+}
+function finishLoad(){
+    const el=document.getElementById('loading');
+    el.classList.add('out');
+    setTimeout(()=>{ el.remove(); showHUD(); },1200);
+}
+function showHUD(){
+    ['nametag','controls','speed'].forEach(id=>document.getElementById(id).classList.add('show'));
+}
+
+// ─── WALLPAPER TEXTURE (procedural) ──────────────────────────
+function makeWallpaperTexture(){
+    const cvs=document.createElement('canvas');
+    cvs.width=512; cvs.height=512;
+    const c=cvs.getContext('2d');
+    // Base color — deep muted teal-navy
+    c.fillStyle='#1a1f3a';
+    c.fillRect(0,0,512,512);
+    // Subtle vertical stripe
+    for(let x=0;x<512;x+=32){
+        const g=c.createLinearGradient(x,0,x+32,0);
+        g.addColorStop(0,'rgba(255,255,255,0.0)');
+        g.addColorStop(0.5,'rgba(255,255,255,0.025)');
+        g.addColorStop(1,'rgba(255,255,255,0.0)');
+        c.fillStyle=g;
+        c.fillRect(x,0,32,512);
     }
-  }
-
-  for(let i=0;i<N;i++){
-    const l = mkLeaf();
-    l.y = Math.random() * H;
-    leaves.push(l);
-  }
-
-  function drawPetal(ctx, x, y, size, rot, color, alpha){
-    ctx.save();
-    ctx.globalAlpha = alpha;
-    ctx.translate(x, y);
-    ctx.rotate(rot);
-    ctx.beginPath();
-    // Sakura petal shape
-    ctx.moveTo(0, -size);
-    ctx.bezierCurveTo(size*.7, -size*.6, size*.9, size*.1, 0, size*.8);
-    ctx.bezierCurveTo(-size*.9, size*.1, -size*.7, -size*.6, 0, -size);
-    ctx.closePath();
-    ctx.fillStyle = color;
-    ctx.fill();
-    // Notch at top
-    ctx.beginPath();
-    ctx.arc(0, -size+size*.18, size*.18, 0, Math.PI*2);
-    ctx.fillStyle = 'rgba(255,255,255,.3)';
-    ctx.fill();
-    ctx.restore();
-  }
-
-  function loop(){
-    ctx.clearRect(0,0,W,H);
-    for(const l of leaves){
-      l.swing += l.swingSpd;
-      l.x += l.vx + Math.sin(l.swing) * l.swingAmp;
-      l.y += l.vy;
-      l.rot += l.rotSpd;
-      if(l.y > H + 20){ Object.assign(l, mkLeaf()); l.y=-20 }
-      if(l.x > W + 20){ l.x = -20 }
-      drawPetal(ctx, l.x, l.y, l.size, l.rot, l.color, l.alpha);
+    // Diamond/herringbone pattern
+    c.save();
+    c.strokeStyle='rgba(200,200,255,0.06)';
+    c.lineWidth=1;
+    const sz=48;
+    for(let y=-sz;y<512+sz;y+=sz){
+        for(let x=-sz;x<512+sz;x+=sz){
+            c.beginPath();
+            c.moveTo(x+sz/2, y);
+            c.lineTo(x+sz, y+sz/2);
+            c.lineTo(x+sz/2, y+sz);
+            c.lineTo(x, y+sz/2);
+            c.closePath();
+            c.stroke();
+        }
     }
-    requestAnimationFrame(loop);
-  }
-  loop();
-})();
-
-/* ── SCROLL PROGRESS ──────────────────────────────────────── */
-window.addEventListener('scroll',()=>{
-  const d=document.documentElement;
-  document.getElementById('prog').style.width=(d.scrollTop/(d.scrollHeight-d.clientHeight)*100)+'%';
-});
-
-/* ── NAV SECTION SWITCHING ────────────────────────────────── */
-function showSec(id){
-  document.querySelectorAll('section').forEach(s=>s.style.display='none');
-  const sec=document.getElementById(id);
-  sec.style.display='block';
-  sec.classList.remove('sec-enter'); void sec.offsetWidth; sec.classList.add('sec-enter');
-  document.querySelectorAll('.nav-links a').forEach(a=>{
-    a.classList.toggle('active', a.dataset.sec===id);
-  });
-  window.scrollTo({top:0});
-  if(id==='home') animCount();
-  return false;
+    c.restore();
+    // Tiny dots at intersections
+    c.fillStyle='rgba(200,220,255,0.07)';
+    for(let y=0;y<512;y+=sz){
+        for(let x=0;x<512;x+=sz){
+            c.beginPath();
+            c.arc(x+sz/2, y+sz/2, 2.5, 0, Math.PI*2);
+            c.fill();
+        }
+    }
+    const tex=new THREE.CanvasTexture(cvs);
+    tex.wrapS=tex.wrapT=THREE.RepeatWrapping;
+    tex.repeat.set(5, 5);
+    return tex;
 }
 
-/* ── COUNTERS ─────────────────────────────────────────────── */
-let countDone=false;
-function animCount(){
-  if(countDone)return; countDone=true;
-  document.querySelectorAll('[data-count]').forEach(el=>{
-    const tgt=parseInt(el.dataset.count), suf=el.dataset.suffix||'';
-    let v=0; const inc=tgt/55;
-    const t=setInterval(()=>{
-      v+=inc;
-      if(v>=tgt){v=tgt;clearInterval(t);}
-      el.textContent=Math.floor(v)+(v>=tgt?suf||'+':'');
-    },18);
-  });
-}
-setTimeout(animCount,800);
-
-/* ── MOBILE MENU ──────────────────────────────────────────── */
-const burger=document.getElementById('burger');
-const mobMenu=document.getElementById('mob-menu');
-burger.addEventListener('click',()=>{
-  const open=mobMenu.classList.toggle('open');
-  burger.classList.toggle('open',open);
-});
-function closeMob(){mobMenu.classList.remove('open');burger.classList.remove('open')}
-document.addEventListener('click',e=>{
-  if(!mobMenu.classList.contains('open'))return;
-  if(mobMenu.contains(e.target)||burger.contains(e.target))return;
-  closeMob();
-});
-
-/* ── LIGHTBOX ─────────────────────────────────────────────── */
-let lbImages=[];
-let lbIdx=0;
-
-function openLightbox(caption, imgId){
-  const lb=document.getElementById('lightbox');
-  document.getElementById('lb-caption').textContent=caption;
-  lb.classList.add('open');
-  document.addEventListener('keydown',lbKey);
+function makeWallpaperMat(rough=0.92){
+    const tex=makeWallpaperTexture();
+    return new THREE.MeshStandardMaterial({map:tex, roughness:rough, metalness:0.02, color:0xffffff});
 }
 
-function closeLightbox(){
-  document.getElementById('lightbox').classList.remove('open');
-  document.removeEventListener('keydown',lbKey);
+// ─── FLOOR TEXTURE ───────────────────────────────────────────
+function makeFloorTexture(){
+    const cvs=document.createElement('canvas');
+    cvs.width=512; cvs.height=512;
+    const c=cvs.getContext('2d');
+    // Parquet wood planks
+    const planks=[
+        {x:0,w:128,col:'#2a1f12'},{x:128,w:102,col:'#261c10'},{x:230,w:115,col:'#2d2214'},
+        {x:345,w:95,col:'#231b0e'},{x:440,w:72,col:'#2a1f12'}
+    ];
+    planks.forEach(p=>{
+        c.fillStyle=p.col; c.fillRect(p.x,0,p.w,512);
+        // Wood grain lines
+        c.strokeStyle='rgba(0,0,0,0.12)'; c.lineWidth=1;
+        for(let y=0;y<512;y+=18+Math.random()*12){
+            c.beginPath();
+            let lx=p.x;
+            c.moveTo(lx,y);
+            for(let sx=0;sx<p.w;sx+=8){ c.lineTo(lx+sx, y+Math.sin(sx*.2+y*.1)*1.5); }
+            c.stroke();
+        }
+        // Plank border
+        c.strokeStyle='rgba(0,0,0,0.25)'; c.lineWidth=1.5;
+        c.strokeRect(p.x+.75,0,p.w-1.5,512);
+    });
+    const tex=new THREE.CanvasTexture(cvs);
+    tex.wrapS=tex.wrapT=THREE.RepeatWrapping;
+    tex.repeat.set(3,3);
+    return tex;
 }
 
-function lbKey(e){
-  if(e.key==='Escape') closeLightbox();
+// ─── GEOMETRY HELPERS ────────────────────────────────────────
+const root = new THREE.Group();
+scene.add(root);
+
+function mstd(hex,rough=0.8,metal=0,em=0,emI=0){
+    return new THREE.MeshStandardMaterial({color:hex,roughness:rough,metalness:metal,emissive:em||0,emissiveIntensity:emI});
+}
+function place(geo,mat,x,y,z,rx=0,ry=0,rz=0,cast=true,recv=true){
+    const m=new THREE.Mesh(geo,mat);
+    m.position.set(x,y,z);
+    m.rotation.set(rx,ry,rz);
+    m.castShadow=cast; m.receiveShadow=recv;
+    root.add(m); return m;
+}
+function bx(w,h,d,col,rough,metal,x,y,z,rx=0,ry=0,rz=0,cast=true,recv=true,em=0,emI=0){
+    return place(new THREE.BoxGeometry(w,h,d),mstd(col,rough,metal,em,emI),x,y,z,rx,ry,rz,cast,recv);
+}
+function cyl(rt,rb,h,seg,col,rough,metal,x,y,z,rx=0,ry=0,rz=0){
+    return place(new THREE.CylinderGeometry(rt,rb,h,seg),mstd(col,rough,metal),x,y,z,rx,ry,rz);
+}
+function sph(r,col,rough,metal,x,y,z,cast=true){
+    return place(new THREE.SphereGeometry(r,20,16),mstd(col,rough,metal),x,y,z,0,0,0,cast);
+}
+// Rounded box using stretched sphere trick — gives cartoon look
+function roundBox(w,h,d,r,mat,x,y,z,rx=0,ry=0,rz=0,cast=true,recv=true){
+    const geo=new THREE.BoxGeometry(w,h,d,1,1,1);
+    const pos=geo.attributes.position;
+    for(let i=0;i<pos.count;i++){
+        const v=new THREE.Vector3(pos.getX(i),pos.getY(i),pos.getZ(i));
+        const nx=Math.max(Math.abs(v.x)-w/2+r,0);
+        const ny=Math.max(Math.abs(v.y)-h/2+r,0);
+        const nz=Math.max(Math.abs(v.z)-d/2+r,0);
+        const len=Math.sqrt(nx*nx+ny*ny+nz*nz)||0.001;
+        pos.setXYZ(i,v.x+(nx/len-0)*r*Math.sign(v.x||1)*0,v.y,v.z);
+    }
+    geo.computeVertexNormals();
+    const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),mat);
+    m.position.set(x,y,z);
+    m.rotation.set(rx,ry,rz);
+    m.castShadow=cast; m.receiveShadow=recv;
+    root.add(m); return m;
 }
 
-function lbNext(){ /* extend with real images later */ }
-function lbPrev(){ /* extend with real images later */ }
+// ─── ROOM ────────────────────────────────────────────────────
+const DH=1.05; // desk height
+let screenMesh, screenMat, screenTex;
 
-document.getElementById('lightbox').addEventListener('click',function(e){
-  if(e.target===this) closeLightbox();
-});
+function buildRoom(){
+    // Floor — parquet
+    const floorTex=makeFloorTexture();
+    const flMat=new THREE.MeshStandardMaterial({map:floorTex,roughness:.82,metalness:.04});
+    const fl=new THREE.Mesh(new THREE.PlaneGeometry(22,18),flMat);
+    fl.rotation.x=-Math.PI/2; fl.receiveShadow=true; root.add(fl);
 
-/* ── FORM ─────────────────────────────────────────────────── */
-function handleForm(e){
-  const b=e.target;
-  b.innerHTML='<i class="fa-solid fa-check"></i> MESSAGE ENVOYÉ !';
-  b.style.background='#2d6a4f';b.style.borderColor='#2d6a4f';
-  setTimeout(()=>{
-    b.innerHTML='ENVOYER &nbsp;<i class="fa-solid fa-paper-plane"></i>';
-    b.style.background=''; b.style.borderColor='';
-  },3200);
+    const wMat=makeWallpaperMat(.88);
+    const wMatSide=makeWallpaperMat(.9);
+
+    // Back wall
+    place(new THREE.BoxGeometry(22,.14,18),mstd(0x141824,.96,.04),0,12.07,0,0,0,0,false,false);
+    const backW=new THREE.Mesh(new THREE.PlaneGeometry(22,12),wMat);
+    backW.position.set(0,6,-9); backW.receiveShadow=true; root.add(backW);
+
+    // Left wall
+    const leftW=new THREE.Mesh(new THREE.PlaneGeometry(18,12),wMatSide);
+    leftW.position.set(-11,6,0); leftW.rotation.y=Math.PI/2; leftW.receiveShadow=true; root.add(leftW);
+
+    // Right wall
+    const rightW=new THREE.Mesh(new THREE.PlaneGeometry(18,12),wMatSide);
+    rightW.position.set(11,6,0); rightW.rotation.y=-Math.PI/2; rightW.receiveShadow=true; root.add(rightW);
+
+    // Ceiling
+    const ceilMat=new THREE.MeshStandardMaterial({color:0xf0eee6,roughness:.95,metalness:0});
+    const ceil=new THREE.Mesh(new THREE.PlaneGeometry(22,18),ceilMat);
+    ceil.rotation.x=Math.PI/2; ceil.position.y=12; root.add(ceil);
+
+    // Crown molding (cartoon-thick)
+    const moldM=mstd(0xe8e4d8,.88,0);
+    place(new THREE.BoxGeometry(22,.22,.22),moldM,0,11.9,-8.89,0,0,0,false,false);
+    place(new THREE.BoxGeometry(.22,.22,18),moldM,-10.89,11.9,0,0,0,0,false,false);
+    place(new THREE.BoxGeometry(.22,.22,18),moldM,10.89,11.9,0,0,0,0,false,false);
+    // Baseboard
+    const baseM=mstd(0xe0dcd0,.85,0);
+    place(new THREE.BoxGeometry(22,.3,.08),baseM,0,.15,-8.96,0,0,0,false,true);
+    place(new THREE.BoxGeometry(.08,.3,18),baseM,-10.96,.15,0,0,0,0,false,true);
+    place(new THREE.BoxGeometry(.08,.3,18),baseM,10.96,.15,0,0,0,0,false,true);
+
+    // Rug — large, patterned look
+    const rugMat=new THREE.MeshStandardMaterial({color:0x7a3f3f,roughness:.97,metalness:0});
+    place(new THREE.PlaneGeometry(5.5,4.2),rugMat,.1,.012,1.5,-Math.PI/2,0,0,false,false);
+    // Rug border stripes
+    const rb=mstd(0xd4b88c,.9,0);
+    place(new THREE.PlaneGeometry(5.5,.18),rb,.1,.013,-.52,-Math.PI/2,0,0,false);
+    place(new THREE.PlaneGeometry(5.5,.18),rb,.1,.013,3.52,-Math.PI/2,0,0,false);
+    place(new THREE.PlaneGeometry(.18,4.2),rb,-2.57,.013,1.5,-Math.PI/2,0,0,false);
+    place(new THREE.PlaneGeometry(.18,4.2),rb,2.77,.013,1.5,-Math.PI/2,0,0,false);
+
+    // Window — large, cartoon-framed
+    const winFrameM=mstd(0xf0ece2,.75,.05);
+    // Frame thick outer
+    place(new THREE.BoxGeometry(3.8,.2,.18),winFrameM,5,6.12,-8.9,0,0,0,false,true);
+    place(new THREE.BoxGeometry(3.8,.2,.18),winFrameM,5,8.72,-8.9,0,0,0,false,true);
+    place(new THREE.BoxGeometry(.2,2.8,.18),winFrameM,3.12,7.42,-8.9,0,0,0,false,true);
+    place(new THREE.BoxGeometry(.2,2.8,.18),winFrameM,6.88,7.42,-8.9,0,0,0,false,true);
+    // Cross divider
+    place(new THREE.BoxGeometry(3.6,.1,.12),winFrameM,5,7.4,-8.9,0,0,0,false,false);
+    place(new THREE.BoxGeometry(.1,2.6,.12),winFrameM,5,7.4,-8.9,0,0,0,false,false);
+    // Glass — glowing blue daylight
+    const glassMat=new THREE.MeshStandardMaterial({color:0x87c8ff,emissive:0x5599cc,emissiveIntensity:.35,roughness:.06,metalness:.1,transparent:true,opacity:.55});
+    place(new THREE.PlaneGeometry(3.6,2.58),glassMat,5,7.42,-8.88,0,0,0,false,false);
+    // Curtains — soft draping using multiple pieces
+    const curtM=mstd(0x3d2e5c,.82,0);
+    // Left curtain
+    place(new THREE.BoxGeometry(.55,3.6,.08),curtM,2.78,7.2,-8.82,0,0,.05,true,false);
+    place(new THREE.BoxGeometry(.55,3.6,.08),curtM,2.65,7.2,-8.72,0,0,.03,false,false);
+    // Right curtain
+    place(new THREE.BoxGeometry(.55,3.6,.08),curtM,7.22,7.2,-8.82,0,0,-.05,true,false);
+    place(new THREE.BoxGeometry(.55,3.6,.08),curtM,7.35,7.2,-8.72,0,0,-.03,false,false);
+    // Curtain rod
+    cyl(.03,.03,.05,12,0xa89070,.3,.6,4.5,9.0,-8.7);
+    place(new THREE.BoxGeometry(5.2,.05,.05),mstd(0xa89070,.3,.6),5,9.0,-8.7,0,0,0,false,false);
+    cyl(.03,.03,.05,12,0xa89070,.3,.6,5.5,9.0,-8.7);
+
+    // Framed art — left wall
+    const artFrameM=mstd(0x4a3828,.55,.15);
+    place(new THREE.BoxGeometry(2.6,1.8,.1),artFrameM,-8.5,5.8,-4,0,Math.PI/2,0,false,true);
+    const artMat=new THREE.MeshStandardMaterial({color:0x1a2840,emissive:0x0a1428,emissiveIntensity:.12,roughness:.9});
+    place(new THREE.PlaneGeometry(2.3,1.5),artMat,-10.92,5.8,-4,0,Math.PI/2,0,false,false);
+    // Art content — abstract geometric
+    const artContentMat=new THREE.MeshStandardMaterial({color:0xc8ff3e,emissive:0xc8ff3e,emissiveIntensity:.08,roughness:.85});
+    place(new THREE.PlaneGeometry(1.4,.9),artContentMat,-10.93,5.8,-4,0,Math.PI/2,0,false,false);
+
+    // Second framed art — back wall
+    place(new THREE.BoxGeometry(1.8,1.4,.1),artFrameM,-4.5,7.2,-8.95,0,0,0,false,true);
+    place(new THREE.PlaneGeometry(1.5,1.1),new THREE.MeshStandardMaterial({color:0xffcfa0,emissive:0x885840,emissiveIntensity:.06,roughness:.88}),-4.5,7.2,-8.9,0,0,0,false,false);
+
+    // Bookshelf unit (left wall)
+    buildBookshelf(-8.8,0,-5);
+
+    // Ceiling light fixture — pendant lamp cartoon style
+    buildCeilingLight(0,11.8,-.5);
+    buildCeilingLight(-4.5,11.8,-2);
+
+    // Door (right side)
+    place(new THREE.BoxGeometry(.14,3.6,1.9),mstd(0xd4c8b0,.65,.05),10.95,1.8,7,0,0,0,false,true);
+    place(new THREE.BoxGeometry(.06,.2,.18),mstd(0xd4a84a,.25,.75),10.9,1.8,6.1,0,0,0,false,false);
+    // Door frame
+    const dfM=mstd(0xe0dcd0,.8,0);
+    place(new THREE.BoxGeometry(.08,.16,2.1),dfM,10.96,3.6,7,0,0,0,false,true);
+    place(new THREE.BoxGeometry(.08,3.76,.16),dfM,10.96,1.8,5.95,0,0,0,false,true);
+    place(new THREE.BoxGeometry(.08,3.76,.16),dfM,10.96,1.8,8.05,0,0,0,false,true);
+
+    // Small side table (right)
+    buildSideTable(7.5, 0, 4.5);
+
+    // Bed (right corner)
+    buildBed(7.5, 0, 7.0);
 }
 
-/* ── KONAMI CODE ──────────────────────────────────────────── */
-const KON=[38,38,40,40,37,39,37,39,66,65]; let ki=0;
+function buildBookshelf(x,y,z){
+    const shelfM=mstd(0x3d2a1a,.7,.06);
+    // Body
+    place(new THREE.BoxGeometry(.2,4.4,2.2),shelfM,x+1.1,y+2.2,z,0,0,0,true,true);
+    place(new THREE.BoxGeometry(.2,4.4,2.2),shelfM,x-.1,y+2.2,z,0,0,0,true,true);
+    place(new THREE.BoxGeometry(1.2,.2,2.2),shelfM,x+.5,y+.1,z,0,0,0,false,true);
+    place(new THREE.BoxGeometry(1.2,.2,2.2),shelfM,x+.5,y+4.3,z,0,0,0,false,false);
+    [1.1,2.1,3.1].forEach(sy=>{
+        place(new THREE.BoxGeometry(1.2,.12,2.2),shelfM,x+.5,y+sy,z,0,0,0,false,true);
+    });
+    // Back panel
+    place(new THREE.BoxGeometry(1.2,4.4,.08),mstd(0x2a1a10,.85,0),x+.5,y+2.2,z-1.1,0,0,0,false,true);
+    // Books — colorful cartoon style
+    const bookCols=[0xe74c3c,0x3498db,0x27ae60,0xf39c12,0x9b59b6,0xe67e22,0x1abc9c,0xe74c3c,0x2980b9];
+    bookCols.forEach((col,i)=>{
+        const bh=.42+Math.random()*.28;
+        const bw=.1+Math.random()*.06;
+        const shelf=Math.floor(i/3);
+        const pos=i%3;
+        bx(bw,bh,.22,col,.75,0,x-.02+pos*.35+bw/2,y+shelf*1.0+.12+bh/2,z,0,(Math.random()-.5)*.05,0);
+    });
+}
+
+function buildCeilingLight(x,y,z){
+    // Cord
+    place(new THREE.BoxGeometry(.02,.8,.02),mstd(0x222,0.9,0.1),x,y-.4,z,0,0,0,false,false);
+    // Shade — cartoon bubble shape
+    const shadeM=new THREE.MeshStandardMaterial({color:0xfff8e7,emissive:0xffd080,emissiveIntensity:.18,roughness:.4,metalness:.1,side:THREE.DoubleSide});
+    place(new THREE.SphereGeometry(.42,20,12,0,Math.PI*2,0,Math.PI*.6),shadeM,x,y-.85,z,Math.PI,0,0,false,false);
+    cyl(.04,.04,.05,12,0x555580,.2,.6,x,y-.84,z,0,0,0,false,false);
+    // Light glow orb
+    const bulb=new THREE.Mesh(new THREE.SphereGeometry(.14,16,12),new THREE.MeshStandardMaterial({color:0xfff3cc,emissive:0xffdd88,emissiveIntensity:2.5,roughness:.1}));
+    bulb.position.set(x,y-.88,z);
+    root.add(bulb);
+}
+
+function buildSideTable(x,y,z){
+    // Round tabletop — cartoon style
+    cyl(.52,.52,.06,24,0xf5e6d0,.65,.05,x,y+.74,z);
+    // Legs  
+    const legM=mstd(0x3d2a1a,.6,.08);
+    [[-1,-.8],[1,-.8],[0,.8]].forEach(([lx,lz])=>{
+        cyl(.04,.04,.72,10,0x3d2a1a,.6,.08,x+lx*.3,y+.36,z+lz*.3);
+    });
+    // Items on side table
+    // Mug
+    cyl(.085,.075,.16,20,0x4a7cc7,.7,.1,x,y+.85,z);
+    cyl(.068,.068,.015,20,0x2a1a08,.6,0,x,y+.97,z);
+    place(new THREE.TorusGeometry(.055,.01,8,16),mstd(0x4a7cc7,.7,.1),x+.1,y+.85,z,Math.PI/2,0,0,false);
+    // Phone
+    bx(.06,.14,.012,0x1a1a2e,.3,.8,x-.18,y+.78,z+.04,0,-.3,.04,false,false);
+}
+
+function buildBed(x,y,z){
+    // Bed frame — cartoon rounded look
+    const frameM=mstd(0x5a3e28,.65,.08);
+    // Platform
+    place(new THREE.BoxGeometry(3.4,.25,2.2),frameM,x,y+.25,z,0,0,0,true,true);
+    // Headboard — tall, cartoon friendly
+    place(new THREE.BoxGeometry(3.4,1.4,.18),frameM,x,y+.98,z-1.1,0,0,0,true,true);
+    // Rounded headboard top accent
+    cyl(.35,.35,.2,24,0x7a5438,.6,.06,x-1.05,y+1.58,z-1.09,Math.PI/2,0,0,false,false);
+    cyl(.35,.35,.2,24,0x7a5438,.6,.06,x,y+1.58,z-1.09,Math.PI/2,0,0,false,false);
+    cyl(.35,.35,.2,24,0x7a5438,.6,.06,x+1.05,y+1.58,z-1.09,Math.PI/2,0,0,false,false);
+    // Footboard
+    place(new THREE.BoxGeometry(3.4,.65,.12),frameM,x,y+.57,z+1.1,0,0,0,true,true);
+    // Mattress
+    place(new THREE.BoxGeometry(3.2,.22,2.0),mstd(0xf0ede8,.92,0),x,y+.47,z,0,0,0,false,true);
+    // Duvet — puffy cartoon style
+    place(new THREE.BoxGeometry(3.1,.18,1.7),mstd(0x4a6fa5,.85,0),x,y+.6,z+.05,-.02,0,.01,false,true);
+    // Duvet fold
+    place(new THREE.BoxGeometry(3.1,.1,.5),mstd(0x5a80b5,.82,0),x,y+.65,z-.7,0,0,0,false,false);
+    // Two pillows
+    place(new THREE.BoxGeometry(1.1,.18,.7),mstd(0xf5f0ea,.9,0),x-.75,y+.7,z-.85,.05,0,-.02,false,false);
+    place(new THREE.BoxGeometry(1.1,.18,.7),mstd(0xf5f0ea,.9,0),x+.75,y+.7,z-.85,.03,0,.02,false,false);
+    // Bedside lamp
+    cyl(.06,.06,.45,12,0x8a6a4a,.6,.08,x-2.0,y+.76,z-.5);
+    cyl(.28,.18,.06,16,0xfff3d5,.3,.1,x-2.0,y+1.0,z-.5);
+    const lampGlow=new THREE.Mesh(new THREE.SphereGeometry(.08,12,10),new THREE.MeshStandardMaterial({color:0xfff0c0,emissive:0xffdd88,emissiveIntensity:1.8,roughness:.1}));
+    lampGlow.position.set(x-2.0,y+.98,z-.5);
+    root.add(lampGlow);
+    // Nightstand
+    bx(.7,.5,.6,0x5a3e28,.65,.08,x-1.88,y+.25,z-.5,0,0,0,true,true);
+    bx(.6,.22,.52,0x6a4e38,.6,.06,x-1.88,y+.37,z-.5,0,0,0,false,true);
+}
+
+// ─── DESK ────────────────────────────────────────────────────
+function buildDesk(){
+    // Desk top — cartoon rounded corners feel via slightly smoothed geo
+    const deskM=new THREE.MeshStandardMaterial({color:0xf5e8d0,roughness:.62,metalness:.02});
+    place(new THREE.BoxGeometry(4.2,.1,2.2),deskM,0,DH+.05,.5,0,0,0,true,true);
+    // Desk edge highlight
+    place(new THREE.BoxGeometry(4.2,.02,2.2),mstd(0xdac8a0,.4,.08),0,DH+.1,.5,0,0,0,false,false);
+    // Dark top strip (monitor area)
+    place(new THREE.PlaneGeometry(3.8,1.2),mstd(0xe8ddc8,.7,0),.0,DH+.11,-.1,-Math.PI/2,0,0,false,false);
+
+    // Legs — L-shaped steel, cartoon clean
+    const legM=mstd(0x2a2a3a,.12,.9);
+    [[-1.9,-.6],[1.9,-.6],[-1.9,1.6],[1.9,1.6]].forEach(([lx,lz])=>{
+        place(new THREE.BoxGeometry(.08,DH,.08),legM,lx,DH/2,lz,0,0,0,true,true);
+    });
+    // Cross stretcher
+    place(new THREE.BoxGeometry(3.7,.06,.06),legM,0,.24,-.6,0,0,0,false);
+    place(new THREE.BoxGeometry(3.7,.06,.06),legM,0,.24,1.6,0,0,0,false);
+    // Cable management box
+    place(new THREE.BoxGeometry(1.6,.12,.32),mstd(0x1a1a28,.3,.6),-.2,DH-.08,.5,0,0,0,false,false);
+
+    // Drawer block
+    buildDeskDrawers(-1.4, 0, .9);
+}
+
+function buildDeskDrawers(x,y,z){
+    const dM=mstd(0x2a1f14,.7,.06);
+    place(new THREE.BoxGeometry(1.1,.72,1.6),dM,x,y+.36+.04,z,0,0,0,true,true);
+    // Drawer faces
+    [.56,.38,.2].forEach((dy,i)=>{
+        place(new THREE.BoxGeometry(.96,.16,1.5),mstd(0x321f12,.65,.05),x,y+dy,z,0,0,0,false,true);
+        cyl(.022,.022,.14,10,0xd4b060,.3,.65,x+.28,y+dy,z+.76,0,Math.PI/2,0);
+    });
+}
+
+// ─── MONITOR ─────────────────────────────────────────────────
+const previewCvs=document.createElement('canvas');
+previewCvs.width=1024; previewCvs.height=576;
+const pctx=previewCvs.getContext('2d');
+
+function drawScreen(t){
+    const W=1024,H=576,c=pctx;
+    c.clearRect(0,0,W,H);
+    // Background gradient
+    const bg=c.createLinearGradient(0,0,0,H);
+    bg.addColorStop(0,'#080c18'); bg.addColorStop(1,'#050810');
+    c.fillStyle=bg; c.fillRect(0,0,W,H);
+    // Subtle grid
+    c.strokeStyle='rgba(200,220,255,0.04)'; c.lineWidth=1;
+    for(let i=0;i<W;i+=48){c.beginPath();c.moveTo(i,0);c.lineTo(i,H);c.stroke();}
+    for(let j=0;j<H;j+=48){c.beginPath();c.moveTo(0,j);c.lineTo(W,j);c.stroke();}
+    // Navbar
+    c.fillStyle='rgba(8,10,22,.95)'; c.fillRect(0,0,W,52);
+    c.fillStyle='rgba(255,255,255,.05)'; c.fillRect(0,51,W,1);
+    c.font='bold 24px monospace'; c.fillStyle='#f0f0fa'; c.fillText('M.',30,36);
+    c.fillStyle='#c8ff3e'; c.fillText('F.',58,36);
+    ['Accueil','Projets','CV','Veille','Contact'].forEach((l,i)=>{
+        c.fillStyle='rgba(160,160,200,.65)'; c.font='11px monospace'; c.fillText(l,200+i*105,34);
+    });
+    // CTA pill
+    const pp=Math.sin(t*.002)*.3+.7;
+    c.fillStyle=`rgba(200,255,62,${pp*.11})`;
+    c.beginPath(); c.roundRect&&c.roundRect(30,70,300,28,14)||c.rect(30,70,300,28);
+    c.fill();
+    c.strokeStyle=`rgba(200,255,62,${pp*.5})`; c.lineWidth=1;
+    c.beginPath(); c.roundRect&&c.roundRect(30,70,300,28,14)||c.rect(30,70,300,28);
+    c.stroke();
+    const dotPulse=Math.sin(t*.003)*.3+.7;
+    c.fillStyle=`rgba(200,255,62,${dotPulse})`; c.beginPath(); c.arc(48,84,5.5,0,Math.PI*2); c.fill();
+    c.fillStyle='rgba(200,255,62,.9)'; c.font='bold 11px monospace'; c.fillText('Disponible en alternance 2026',62,88);
+    // Main heading
+    c.font='bold 88px sans-serif'; c.fillStyle='#eeeef8'; c.fillText('Mathis',32,190);
+    const gy=c.createLinearGradient(32,210,200,270);
+    gy.addColorStop(0,'#c8ff3e'); gy.addColorStop(1,'#5effd4');
+    c.font='italic 84px Georgia,serif'; c.fillStyle=gy; c.fillText('Fourey',32,274);
+    // Description
+    c.fillStyle='rgba(120,125,170,.85)'; c.font='13px monospace';
+    c.fillText('Développeur Fullstack & Licence Web & Mobile',32,315);
+    c.fillText('Du backend au pixel près.',32,336);
+    // Buttons
+    c.fillStyle='#c8ff3e'; c.beginPath(); c.roundRect&&c.roundRect(32,364,186,40,5)||c.rect(32,364,186,40); c.fill();
+    c.fillStyle='#080c18'; c.font='bold 13px sans-serif'; c.fillText('Voir mes projets',55,389);
+    c.strokeStyle='rgba(255,255,255,.15)'; c.lineWidth=1;
+    c.beginPath(); c.roundRect&&c.roundRect(228,364,140,40,5)||c.rect(228,364,140,40); c.stroke();
+    c.fillStyle='rgba(160,160,200,.75)'; c.font='bold 13px sans-serif'; c.fillText('Me contacter',250,389);
+    // Stats
+    c.fillStyle='rgba(255,255,255,.03)'; c.fillRect(32,420,W-64,54);
+    [{n:'3+',l:'Projets'},{n:'2 ans',l:'BTS SIO'},{n:'2026',l:'Alternance'}].forEach(({n,l},i)=>{
+        c.fillStyle='#c8ff3e'; c.font='bold 26px monospace'; c.fillText(n,82+i*245,452);
+        c.fillStyle='rgba(140,140,180,.65)'; c.font='10px monospace'; c.fillText(l,82+i*245,468);
+    });
+    // Particles
+    for(let i=0;i<8;i++){
+        const px=640+Math.sin(t*.0012+i*1.3)*190, py=160+Math.cos(t*.0009+i*.85)*120;
+        const a=Math.sin(t*.002+i*.7)*.2+.08;
+        c.fillStyle=`rgba(200,255,62,${a})`; c.beginPath(); c.arc(px,py,2,0,Math.PI*2); c.fill();
+    }
+    // Right glow panel
+    const rg=c.createLinearGradient(680,0,W,H);
+    rg.addColorStop(0,'rgba(0,30,60,.0)'); rg.addColorStop(1,'rgba(10,20,50,.55)');
+    c.fillStyle=rg; c.fillRect(680,0,344,H);
+    // Screen glow from top
+    const vign=c.createRadialGradient(W/2,H/2,W*.2,W/2,H/2,W*.72);
+    vign.addColorStop(0,'rgba(0,0,0,0)'); vign.addColorStop(1,'rgba(0,0,0,.5)');
+    c.fillStyle=vign; c.fillRect(0,0,W,H);
+}
+
+function buildMonitor(){
+    const MZ=-.55, MY=DH+.05+.62;
+    // Monitor stand base — cartoon disk
+    cyl(.3,.3,.04,24,0x181828,.15,.82,0,DH+.065,.3+.18);
+    cyl(.055,.055,.52,12,0x181828,.15,.82,0,DH+.065+.26,.3+.18);
+    // Arm
+    place(new THREE.BoxGeometry(.06,.06,.3),mstd(0x181828,.15,.82),0,MY-.25,MZ+.12,0,0,0,false,false);
+    // Bezel — cartoon thick, rounded feel
+    const bezM=mstd(0x0e0e1e,.12,.75);
+    place(new THREE.BoxGeometry(2.0,1.15,.08),bezM,0,MY,MZ);
+    // Screen surface
+    drawScreen(0);
+    screenTex=new THREE.CanvasTexture(previewCvs);
+    screenMat=new THREE.MeshStandardMaterial({
+        map:screenTex,emissiveMap:screenTex,
+        emissive:new THREE.Color(1,1,1),emissiveIntensity:.75,
+        roughness:.03,metalness:.06
+    });
+    screenMesh=new THREE.Mesh(new THREE.PlaneGeometry(1.76,.99),screenMat);
+    screenMesh.position.set(0,MY,MZ+.045);
+    root.add(screenMesh);
+    // RGB underglow strip (cartoon vibrant)
+    const rgbM=new THREE.MeshStandardMaterial({color:0xc8ff3e,emissive:0xc8ff3e,emissiveIntensity:6,roughness:.05,metalness:.9});
+    place(new THREE.BoxGeometry(2.0,.015,.015),rgbM,0,MY-.595,MZ-.02,0,0,0,false,false);
+    // Monitor screen glow halo
+    const halo=new THREE.Mesh(new THREE.PlaneGeometry(3.2,2.0),new THREE.MeshBasicMaterial({color:0x6ecfff,transparent:true,opacity:.07,depthWrite:false}));
+    halo.position.set(0,MY,MZ-.18); root.add(halo);
+    // Webcam dot
+    cyl(.025,.025,.02,12,0x222,0.3,0.5,0,MY+.55,MZ-.03);
+    sph(.018,0x111111,.2,.1,0,MY+.55,MZ-.015,false);
+}
+
+// ─── KEYBOARD ────────────────────────────────────────────────
+function buildKeyboard(){
+    const Y=DH+.07, KX=0, KZ=.9;
+    // Body — cartoon slab
+    const kbM=new THREE.MeshStandardMaterial({color:0x13131f,roughness:.38,metalness:.65});
+    place(new THREE.BoxGeometry(1.12,.035,.42),kbM,KX,Y,KZ,-.04,0,0);
+    // Side LED strip
+    bx(1.1,.005,.022,0xc8ff3e,.1,.9,KX,Y+.02,KZ+.21,-.04,0,0,false,false,0xc8ff3e,2.8);
+    // Keys — cleaner grid
+    const kM=mstd(0x1e1e2e,.45,.4);
+    const kLight=mstd(0x222238,.4,.45);
+    for(let r=0;r<4;r++){
+        for(let k=0;k<14;k++){
+            const m=r===0?kLight:kM;
+            place(new THREE.BoxGeometry(.055,.016,.042),m,KX-.445+k*.069,Y+.026,KZ-.12+r*.065,-.04,0,0,false);
+        }
+    }
+    // Space bar
+    place(new THREE.BoxGeometry(.32,.016,.042),kM,KX-.04,Y+.026,KZ+.1,-.04,0,0,false);
+}
+
+// ─── MOUSE ───────────────────────────────────────────────────
+let mouseMesh;
+function buildMouse(){
+    const Y=DH+.058, MX=1.22, MZ=.9;
+    const mouseM=new THREE.MeshStandardMaterial({color:0x111120,roughness:.25,metalness:.65});
+    mouseMesh=place(new THREE.BoxGeometry(.095,.032,.135),mouseM,MX,Y,MZ);
+    cyl(.013,.013,.038,10,0x2a2a40,.4,.6,MX,Y+.024,MZ-.05);
+    bx(.002,.006,.085,0x2e2e42,.3,.7,MX,Y+.02,MZ,0,0,0,false,false);
+    // Logo dot
+    sph(.008,0xc8ff3e,.1,.8,MX,Y+.035,MZ+.01,false);
+}
+
+// ─── DESK ITEMS ──────────────────────────────────────────────
+function buildDeskItems(){
+    // Mug — cartoon chunky
+    const mugM=mstd(0x3a5fa8,.7,.1);
+    cyl(.09,.078,.19,24,0x3a5fa8,.7,.1,1.7,DH+.162,.15);
+    cyl(.068,.068,.018,20,0x1c0f06,.65,0,1.7,DH+.258,.15);
+    // Mug handle — torus segment
+    place(new THREE.TorusGeometry(.06,.012,8,16,Math.PI),mstd(0x3a5fa8,.7,.1),1.78,DH+.16,.15,0,0,Math.PI*.5,false);
+    // Mug print — small decal
+    place(new THREE.PlaneGeometry(.06,.04),mstd(0xc8ff3e,.8,0,.06),1.7,DH+.17,.245,0,0,0,false,false);
+
+    // Notebook — cartoon colored
+    bx(.36,.022,.3,0x1a2950,.88,0,-1.6,DH+.072,.55,0,.38,0);
+    bx(.35,.003,.29,0x2a3a6a,.85,0,-1.6,DH+.084,.55,0,.38,0,false,false);
+    // Notebook spiral
+    for(let i=0;i<10;i++){
+        cyl(.012,.012,.005,8,0xaaa,.4,.5,-1.445+i*.03,DH+.085,.4,-Math.PI/2,.38,0);
+    }
+    // Pen — cartoon marker style
+    cyl(.01,.008,.24,8,0xc8ff3e,.2,.4,-1.38,DH+.094,.4,0,.3,Math.PI/2);
+    cyl(.012,.012,.022,8,0x333,.2,.5,-1.265,DH+.094,.39,0,.3,Math.PI/2);
+
+    // Plant — chunky cartoon style
+    cyl(.1,.075,.16,18,0xe07030,.7,.05,-1.8,DH+.138,-.5);
+    // Soil
+    cyl(.085,.085,.02,18,0x2a1a08,.9,0,-1.8,DH+.222,-.5);
+    // Leaves — blobby cartoon spheres
+    const leafM=mstd(0x28a040,.82,0);
+    const leafDark=mstd(0x1e8030,.85,0);
+    [[0,.1,.0,.082],[.07,.09,.04,.07],[-.07,.08,-.03,.075],[.04,.12,-.04,.068],[-.04,.1,.06,.062]].forEach(([ox,oy,oz,r])=>{
+        place(new THREE.SphereGeometry(r,12,10),(Math.random()>.5?leafM:leafDark),-1.8+ox,DH+.23+oy,-.5+oz,0,0,0,false);
+    });
+
+    // Paper stack
+    bx(.38,.016,.3,0xf4f4ee,.95,0,-1.55,DH+.058,-.2,0,.38,0,false);
+
+    // Sticky note
+    bx(.16,.005,.16,0xffee88,.88,0,-.18,DH+.055,-.28,0,-.15,0,false);
+    // Note lines
+    bx(.12,.001,.008,0xddcc60,.9,0,-.18,DH+.059,-.3,0,-.15,0,false,false);
+    bx(.12,.001,.008,0xddcc60,.9,0,-.18,DH+.059,-.25,0,-.15,0,false,false);
+
+    // Small figurine/toy on shelf (cartoon mascot)
+    cyl(.06,.05,.18,16,0x4a90e2,.7,.05,-7.8,1.22,-4.6);
+    sph(.1,0x4a90e2,.65,.05,-7.8,1.42,-4.6,false);
+    // Eyes
+    sph(.018,0x111,.1,0,-7.75,1.44,-4.51,false);
+    sph(.018,0x111,.1,0,-7.85,1.44,-4.51,false);
+}
+
+// ─── CHAIR ───────────────────────────────────────────────────
+function buildChair(){
+    const fabM=new THREE.MeshStandardMaterial({color:0x1c1c30,roughness:.78,metalness:.05});
+    const metalM=mstd(0x1e1e30,.12,.88);
+    const accentM=mstd(0x2a2a44,.2,.8);
+
+    // Seat cushion — cartoon puffy
+    place(new THREE.BoxGeometry(.78,.12,.78),fabM,0,.9,2.55,0,0,0,true,true);
+    place(new THREE.BoxGeometry(.74,.06,.74),mstd(0x22223a,.75,.05),0,.97,2.55,0,0,0,false,false);
+    // Backrest — tall, cartoon
+    place(new THREE.BoxGeometry(.76,.96,.1),fabM,0,1.5,2.95,-.05,0,0,true,true);
+    // Lumbar pad
+    place(new THREE.BoxGeometry(.68,.26,.06),mstd(0x141428,.18,.85),0,1.12,2.9);
+    // Headrest — rounded
+    place(new THREE.BoxGeometry(.46,.26,.1),fabM,0,2.02,2.97,-.04,0,0,false,false);
+    // Gas cylinder
+    cyl(.05,.06,.52,12,0x1a1a2c,.1,.88,0,.64,2.55);
+    // Star base — 5 arms
+    for(let i=0;i<5;i++){
+        const a=i/5*Math.PI*2;
+        const barm=new THREE.Mesh(new THREE.BoxGeometry(.06,.04,.52),metalM);
+        barm.position.set(Math.sin(a)*.18,.1,2.55+Math.cos(a)*.18);
+        barm.rotation.y=a; barm.castShadow=true; root.add(barm);
+        cyl(.038,.038,.1,10,0x111122,.1,.88,Math.sin(a)*.44,.04,2.55+Math.cos(a)*.44);
+    }
+    // Armrests
+    [-1,1].forEach(s=>{
+        place(new THREE.BoxGeometry(.07,.07,.42),metalM,s*.39,1.06,2.54);
+        place(new THREE.BoxGeometry(.08,.028,.3),fabM,s*.39,1.11,2.54);
+    });
+}
+
+// ─── CHARACTER ───────────────────────────────────────────────
+const char=new THREE.Group();
+scene.add(char);
+char.position.set(0,0,2.15);
+char.rotation.y=Math.PI;
+
+let headG,torsoM,leftUpperArm,rightUpperArm,leftForeArm,rightForeArm,leftHandM,rightHandM;
+// Animated eye pupils for blinking
+let eyePupilL, eyePupilR, eyeScaleL, eyeScaleR;
+let blinkTimer=0, blinkState=0; // 0=open, 1=closing, 2=opening
+
+function buildChar(){
+    // ── Shared materials ──
+    const skin    = new THREE.MeshStandardMaterial({color:0xf0c8a0,roughness:.55,metalness:0});
+    const skinDark= new THREE.MeshStandardMaterial({color:0xd4a87a,roughness:.58,metalness:0});
+    const shirt   = new THREE.MeshStandardMaterial({color:0x1e3d6e,roughness:.65,metalness:.04});
+    const shirtDk = new THREE.MeshStandardMaterial({color:0x162d52,roughness:.68,metalness:.04});
+    const pants   = new THREE.MeshStandardMaterial({color:0x1c2535,roughness:.72,metalness:.02});
+    const pantsDk = new THREE.MeshStandardMaterial({color:0x141c28,roughness:.75,metalness:.02});
+    const shoeM   = new THREE.MeshStandardMaterial({color:0x222236,roughness:.45,metalness:.3});
+    const shoeSole= new THREE.MeshStandardMaterial({color:0xffffff,roughness:.65,metalness:.05});
+    const hair    = new THREE.MeshStandardMaterial({color:0x180f06,roughness:.72,metalness:.02});
+    const hairHi  = new THREE.MeshStandardMaterial({color:0x2a1a0a,roughness:.68,metalness:.02});
+    const glassFr = new THREE.MeshStandardMaterial({color:0x111128,roughness:.1,metalness:.95});
+    const glassLn = new THREE.MeshStandardMaterial({color:0x283070,roughness:.04,metalness:.5,transparent:true,opacity:.28,side:THREE.DoubleSide});
+    const scleraM = new THREE.MeshStandardMaterial({color:0xfafeff,roughness:.4,metalness:0});
+    const irisM   = new THREE.MeshStandardMaterial({color:0x2e5040,roughness:.35,metalness:.05});
+    const pupilM  = new THREE.MeshStandardMaterial({color:0x04060e,roughness:.2,metalness:0});
+    const shineM  = new THREE.MeshStandardMaterial({color:0xffffff,emissive:0xffffff,emissiveIntensity:.8,roughness:.05});
+    const beltM   = new THREE.MeshStandardMaterial({color:0x1e1208,roughness:.45,metalness:.08});
+    const buckleM = new THREE.MeshStandardMaterial({color:0xd4b860,roughness:.18,metalness:.88});
+    const watchM  = new THREE.MeshStandardMaterial({color:0x1a1a30,roughness:.15,metalness:.92});
+    const watchScr= new THREE.MeshStandardMaterial({color:0x050812,emissive:0x1833aa,emissiveIntensity:.5,roughness:.12});
+
+    function add(geo,mat,x,y,z,rx=0,ry=0,rz=0,cast=true,sx=1,sy=1,sz=1){
+        const m=new THREE.Mesh(geo,mat);
+        m.position.set(x,y,z);
+        m.rotation.set(rx,ry,rz);
+        m.scale.set(sx,sy,sz);
+        m.castShadow=cast;
+        char.add(m); return m;
+    }
+
+    // ════════════════════════════════════════
+    // BODY — larger cartoon proportions
+    // ════════════════════════════════════════
+    // Torso — slightly tapered cylinder, broad shoulders feel
+    torsoM = add(new THREE.CylinderGeometry(.26,.28,.60,18),shirt,0,1.63,0);
+    // Torso shading strip (darker side)
+    add(new THREE.CylinderGeometry(.262,.282,.60,18,1,true,Math.PI*.35,Math.PI*.5),shirtDk,0,1.63,0,0,0,0,false);
+    // Shirt lower hem
+    add(new THREE.CylinderGeometry(.28,.30,.055,18),shirtDk,0,1.34,0);
+    // Collar V-neck shape
+    add(new THREE.CylinderGeometry(.14,.20,.06,14),shirtDk,0,1.9,0);
+    // Chest logo area (subtle)
+    add(new THREE.PlaneGeometry(.06,.05),new THREE.MeshStandardMaterial({color:0xc8ff3e,emissive:0xc8ff3e,emissiveIntensity:.2,roughness:.8}),-.08,1.72,.263,0,0,.05,false);
+
+    // NECK — smooth join
+    add(new THREE.CylinderGeometry(.088,.105,.2,14),skin,0,1.97,0);
+
+    // BELT
+    add(new THREE.BoxGeometry(.52,.038,.29),beltM,0,1.34,0);
+    add(new THREE.BoxGeometry(.065,.055,.042),buckleM,0,1.34,.15,0,0,0);
+    // Belt holes strip
+    add(new THREE.BoxGeometry(.52,.004,.005),new THREE.MeshStandardMaterial({color:0x503010,roughness:.9}),0,1.34,.148,0,0,0,false);
+
+    // HIPS — wider, connects to legs naturally
+    add(new THREE.BoxGeometry(.56,.24,.34),pants,0,1.17,0);
+    add(new THREE.BoxGeometry(.54,.12,.32),pantsDk,0,1.07,0); // shadow under
+
+    // ════════════════════════════════════════
+    // LEGS (seated — thighs horizontal, shins down)
+    // ════════════════════════════════════════
+    [-1,1].forEach(s=>{
+        const lx=s*.168;
+        // Thigh — thick, tapered
+        add(new THREE.CylinderGeometry(.105,.092,.38,16),pants,lx,.965,.28,1.46,0,0);
+        // Knee cap
+        add(new THREE.SphereGeometry(.092,16,12),pants,lx,.755,.60,0,0,0);
+        // Shin — slightly thinner
+        add(new THREE.CylinderGeometry(.086,.074,.36,16),pants,lx,.60,.70,0,0,0);
+        // Ankle
+        add(new THREE.SphereGeometry(.076,14,10),skin,lx,.39,.77,0,0,0);
+        // SHOE — blocky cartoon style with two parts
+        // Main body
+        const sk=new THREE.Mesh(new THREE.BoxGeometry(.17,.1,.26),shoeM);
+        sk.position.set(lx,.38,.82); sk.scale.set(1,1,1); sk.castShadow=true; char.add(sk);
+        // Shoe toe — rounded front
+        const sToe=new THREE.Mesh(new THREE.SphereGeometry(.09,14,10),shoeM);
+        sToe.position.set(lx,.39,.96); sToe.scale.set(.9,.65,1); sToe.castShadow=true; char.add(sToe);
+        // Sole stripe
+        add(new THREE.BoxGeometry(.19,.025,.3),shoeSole,lx,.315,.82,0,0,0);
+        // Laces
+        add(new THREE.BoxGeometry(.13,.012,.008),new THREE.MeshStandardMaterial({color:0xffffff,roughness:.8}),lx,.44,.76,0,0,0,false);
+        add(new THREE.BoxGeometry(.13,.012,.008),new THREE.MeshStandardMaterial({color:0xffffff,roughness:.8}),lx,.44,.80,0,0,0,false);
+        add(new THREE.BoxGeometry(.13,.012,.008),new THREE.MeshStandardMaterial({color:0xffffff,roughness:.8}),lx,.44,.84,0,0,0,false);
+    });
+
+    // ════════════════════════════════════════
+    // SHOULDERS & ARMS
+    // ════════════════════════════════════════
+    [-1,1].forEach(s=>{
+        // Shoulder cap — big, cartoony sphere
+        const sh=new THREE.Mesh(new THREE.SphereGeometry(.13,20,16),shirt);
+        sh.position.set(s*.325,1.82,-.01); sh.scale.set(1,.92,1); sh.castShadow=true; char.add(sh);
+
+        // Upper arm — working toward the desk
+        const ua=new THREE.Mesh(new THREE.CylinderGeometry(.082,.068,.38,16),shirt);
+        ua.position.set(s*.355,1.555,.1);
+        ua.rotation.set(.25,0,s*-.08);
+        ua.castShadow=true; char.add(ua);
+
+        // Elbow joint
+        const el=new THREE.Mesh(new THREE.SphereGeometry(.072,16,12),shirt);
+        el.position.set(s*.32,1.3,.28); el.castShadow=true; char.add(el);
+
+        // Forearm — angled toward keyboard/desk
+        const fa=new THREE.Mesh(new THREE.CylinderGeometry(.065,.055,.34,16),shirt);
+        fa.position.set(s*.265,1.145,.52);
+        fa.rotation.set(.72,0,s*.04);
+        fa.castShadow=true; char.add(fa);
+
+        // Wrist — skin shows
+        const wr=new THREE.Mesh(new THREE.SphereGeometry(.052,14,12),skin);
+        wr.position.set(s*.225,1.01,.74); wr.castShadow=true; char.add(wr);
+
+        // HAND — improved cartoon hand with fingers suggested
+        const hn=new THREE.Mesh(new THREE.SphereGeometry(.072,20,16),skin);
+        hn.position.set(s*.215,1.0,.78);
+        hn.scale.set(1.15,.8,.9);
+        hn.castShadow=true; char.add(hn);
+
+        // Finger bumps (3 visible knuckle mounds)
+        [-.04,0,.04].forEach((fx,fi)=>{
+            const fing=new THREE.Mesh(new THREE.SphereGeometry(.028,10,8),skin);
+            fing.position.set(s*.215+fx*s,1.01,.85);
+            fing.scale.set(.8,.7,.6);
+            char.add(fing);
+        });
+        // Thumb
+        const thumb=new THREE.Mesh(new THREE.SphereGeometry(.038,12,10),skin);
+        thumb.position.set(s*.215+s*.065,1.005,.75);
+        thumb.scale.set(.75,.75,.65);
+        char.add(thumb);
+
+        if(s===-1){leftUpperArm=ua; leftForeArm=fa; leftHandM=hn;}
+        if(s===1) {rightUpperArm=ua; rightForeArm=fa; rightHandM=hn;}
+
+        // Watch on left wrist
+        if(s===-1){
+            add(new THREE.CylinderGeometry(.058,.058,.03,16),watchM,s*.225,1.01,.73,Math.PI/2,0,0);
+            add(new THREE.PlaneGeometry(.048,.036),watchScr,s*.224,1.014,.732,Math.PI/2-.04,0,0,false);
+            // Watch band
+            add(new THREE.BoxGeometry(.044,.024,.11),watchM,s*.225,1.01,.685,0,0,0,false);
+            add(new THREE.BoxGeometry(.044,.024,.11),watchM,s*.225,1.01,.775,0,0,0,false);
+        }
+    });
+
+    // ════════════════════════════════════════
+    // HEAD GROUP
+    // ════════════════════════════════════════
+    headG=new THREE.Group();
+    headG.position.set(0,2.32,0);
+    char.add(headG);
+
+    // Head base — slightly wider at cheeks, cartoon proportions
+    const headMesh=new THREE.Mesh(new THREE.SphereGeometry(.26,32,28),skin);
+    headMesh.scale.set(1.0,1.08,.96);
+    headMesh.castShadow=true; headG.add(headMesh);
+
+    // Cheek blush — very subtle, adds life
+    [-1,1].forEach(s=>{
+        const blush=new THREE.Mesh(new THREE.SphereGeometry(.09,12,10),new THREE.MeshStandardMaterial({color:0xffa090,roughness:.9,metalness:0,transparent:true,opacity:.18}));
+        blush.position.set(s*.185,-.05,.2); blush.scale.set(1,.6,.5); headG.add(blush);
+    });
+
+    // EARS — well-shaped
+    [-1,1].forEach(s=>{
+        const earOut=new THREE.Mesh(new THREE.SphereGeometry(.06,16,14),skin);
+        earOut.position.set(s*.244,.02,.0); earOut.scale.set(.52,1,.58); earOut.castShadow=true; headG.add(earOut);
+        const earIn=new THREE.Mesh(new THREE.SphereGeometry(.038,12,10),skinDark);
+        earIn.position.set(s*.245,.01,.0); earIn.scale.set(.3,.7,.35); headG.add(earIn);
+    });
+
+    // ── HAIR ────────────────────────────────
+    // Base cap — covers the top half of head perfectly
+    const hairCap=new THREE.Mesh(new THREE.SphereGeometry(.268,32,28,0,Math.PI*2,0,Math.PI*.5),hair);
+    hairCap.position.set(0,.04,-.01); hairCap.scale.set(1,1,.98); hairCap.castShadow=true; headG.add(hairCap);
+
+    // Side volume — L/R fluffy blocks
+    [-1,1].forEach(s=>{
+        const sv=new THREE.Mesh(new THREE.SphereGeometry(.14,18,14,0,Math.PI*2,0,Math.PI*.65),hair);
+        sv.position.set(s*.22,.05,-.02); sv.scale.set(.7,1,.85); sv.castShadow=true; headG.add(sv);
+        // Lower side bit covering ear
+        const sl=new THREE.Mesh(new THREE.BoxGeometry(.11,.18,.2),hair);
+        sl.position.set(s*.22,-.04,-.01); sl.castShadow=true; headG.add(sl);
+    });
+
+    // Back hair — covers nape
+    const backH=new THREE.Mesh(new THREE.SphereGeometry(.25,24,18,0,Math.PI*2,Math.PI*.42,Math.PI*.44),hair);
+    backH.position.set(0,-.02,-.04); backH.scale.set(1,1,1.12); backH.castShadow=true; headG.add(backH);
+
+    // Fringe — swept right, multiple strands for depth
+    // Main fringe block
+    const fr1=new THREE.Mesh(new THREE.BoxGeometry(.32,.1,.07),hair);
+    fr1.position.set(.015,.155,.2); fr1.rotation.set(-.14,0,.04); headG.add(fr1);
+    // Left fringe swoosh
+    const fr2=new THREE.Mesh(new THREE.BoxGeometry(.22,.09,.06),hair);
+    fr2.position.set(-.1,.13,.18); fr2.rotation.set(-.1,0,-.08); headG.add(fr2);
+    // Right fringe taper
+    const fr3=new THREE.Mesh(new THREE.BoxGeometry(.14,.07,.055),hair);
+    fr3.position.set(.15,.14,.19); fr3.rotation.set(-.12,0,.1); headG.add(fr3);
+    // Cowlick tuft on top
+    const tuft=new THREE.Mesh(new THREE.SphereGeometry(.06,12,10),hairHi);
+    tuft.position.set(.05,.26,.05); tuft.scale.set(.8,1.3,.7); headG.add(tuft);
+
+    // ── FACE FEATURES ───────────────────────
+    // EYEBROWS — thick, slight arch, cartoon expressive
+    [-1,1].forEach(s=>{
+        const browGeo=new THREE.CylinderGeometry(.011,.013,.088,10);
+        const brow=new THREE.Mesh(browGeo,hair);
+        brow.position.set(s*.092,.076,.2);
+        brow.rotation.set(0,0,s*.22); // slight arch
+        brow.scale.set(1,.5,1);
+        headG.add(brow);
+        // Inner brow end slightly thicker
+        const browI=new THREE.Mesh(new THREE.SphereGeometry(.016,10,8),hair);
+        browI.position.set(s*.05,.068,.201); headG.add(browI);
+        const browO=new THREE.Mesh(new THREE.SphereGeometry(.012,10,8),hair);
+        browO.position.set(s*.132,.082,.199); headG.add(browO);
+    });
+
+    // EYES — large cartoon eyes, very expressive
+    [-1,1].forEach(s=>{
+        const EX=s*.092, EY=-.008, EZ=.218;
+
+        // Eye socket shadow (subtle depth)
+        const socket=new THREE.Mesh(new THREE.SphereGeometry(.055,16,14),new THREE.MeshStandardMaterial({color:0xd4a070,roughness:.7,transparent:true,opacity:.3}));
+        socket.position.set(EX,EY,EZ-.012); socket.scale.set(1.1,1,.5); headG.add(socket);
+
+        // Sclera (white of eye) — slightly oval
+        const sc=new THREE.Mesh(new THREE.SphereGeometry(.048,20,16),scleraM);
+        sc.position.set(EX,EY,EZ); sc.scale.set(1.0,.9,.45); headG.add(sc);
+
+        // Iris — coloured
+        const ir=new THREE.Mesh(new THREE.SphereGeometry(.032,18,14),irisM);
+        ir.position.set(EX,EY,EZ+.014); ir.scale.set(1,.85,.35); headG.add(ir);
+
+        // Pupil
+        const pu=new THREE.Mesh(new THREE.SphereGeometry(.02,16,12),pupilM);
+        pu.position.set(EX,EY,EZ+.022); pu.scale.set(1,.85,.25); headG.add(pu);
+        if(s===-1) eyePupilL=pu; else eyePupilR=pu;
+
+        // Main shine (large)
+        const sh1=new THREE.Mesh(new THREE.SphereGeometry(.01,10,8),shineM);
+        sh1.position.set(EX+s*.012,EY+.014,EZ+.026); headG.add(sh1);
+        // Second small shine
+        const sh2=new THREE.Mesh(new THREE.SphereGeometry(.006,8,6),shineM);
+        sh2.position.set(EX-s*.006,EY-.006,EZ+.026); headG.add(sh2);
+
+        // Upper eyelid — curved lid line
+        const lid=new THREE.Mesh(new THREE.CylinderGeometry(.006,.006,.088,10),new THREE.MeshStandardMaterial({color:0xb88060,roughness:.65}));
+        lid.position.set(EX,EY+.04,EZ+.01); lid.rotation.set(0,0,s*.12); lid.scale.set(1,.5,1); headG.add(lid);
+
+        // Eyelash dots (cartoon lash marks above lid)
+        [-1,0,1].forEach((lp,li)=>{
+            const lash=new THREE.Mesh(new THREE.SphereGeometry(.005,8,6),hair);
+            lash.position.set(EX+lp*.025,EY+.046+Math.abs(lp)*.004,EZ+.005);
+            headG.add(lash);
+        });
+
+        // Store sclera for blink animation
+        if(s===-1) eyeScaleL=sc; else eyeScaleR=sc;
+    });
+
+    // NOSE — subtle but clearly defined cartoon nose
+    const noseB=new THREE.Mesh(new THREE.SphereGeometry(.03,14,12),skin);
+    noseB.position.set(0,-.038,.232); noseB.scale.set(.8,.65,.65); headG.add(noseB);
+    // Nostrils (small flat discs on sides)
+    [-1,1].forEach(s=>{
+        const ns=new THREE.Mesh(new THREE.SphereGeometry(.016,10,8),skinDark);
+        ns.position.set(s*.022,-.052,.228); ns.scale.set(.7,.55,.4); headG.add(ns);
+    });
+    // Nose bridge highlight
+    const noseBridge=new THREE.Mesh(new THREE.BoxGeometry(.012,.06,.005),new THREE.MeshStandardMaterial({color:0xffe0c0,roughness:.6,transparent:true,opacity:.25}));
+    noseBridge.position.set(0,.02,.238); headG.add(noseBridge);
+
+    // MOUTH — nice relaxed smile with teeth hint
+    // Lower lip
+    const lipL=new THREE.Mesh(new THREE.SphereGeometry(.055,14,10),skinDark);
+    lipL.position.set(0,-.11,.228); lipL.scale.set(1,.45,.45); headG.add(lipL);
+    // Upper lip
+    const lipU=new THREE.Mesh(new THREE.SphereGeometry(.048,14,10),skinDark);
+    lipU.position.set(0,-.085,.232); lipU.scale.set(1,.4,.4); headG.add(lipU);
+    // Smile crease — two small dimple dots
+    [-1,1].forEach(s=>{
+        const dim=new THREE.Mesh(new THREE.SphereGeometry(.016,10,8),skinDark);
+        dim.position.set(s*.048,-.096,.228); dim.scale.set(.7,.5,.4); headG.add(dim);
+    });
+    // Teeth (just a strip visible)
+    const teeth=new THREE.Mesh(new THREE.BoxGeometry(.06,.016,.012),new THREE.MeshStandardMaterial({color:0xfafafa,roughness:.4}));
+    teeth.position.set(0,-.096,.233); headG.add(teeth);
+
+    // GLASSES — square frames, cartoon-thick, very stylish
+    [-1,1].forEach(s=>{
+        const GX=s*.096, GY=-.01, GZ=.222;
+        const GW=.19, GH=.13;
+
+        // Frame box (main face)
+        const fr=new THREE.Mesh(new THREE.BoxGeometry(GW,GH,.016),glassFr);
+        fr.position.set(GX,GY,GZ); headG.add(fr);
+
+        // Lens
+        const ln=new THREE.Mesh(new THREE.BoxGeometry(GW-.018,GH-.016,.008),glassLn);
+        ln.position.set(GX,GY,GZ+.006); headG.add(ln);
+
+        // Frame edge highlight (thin bright strip = cartoon cel look)
+        const hiBorder=new THREE.Mesh(new THREE.BoxGeometry(GW+.004,GH+.004,.004),new THREE.MeshStandardMaterial({color:0x3a3a5e,roughness:.12,metalness:.8}));
+        hiBorder.position.set(GX,GY,GZ-.007); headG.add(hiBorder);
+
+        // Temple arm
+        const arm=new THREE.Mesh(new THREE.BoxGeometry(.19,.012,.012),glassFr);
+        arm.position.set(GX+s*.148,GY,GZ-.05); arm.rotation.y=s*.42; headG.add(arm);
+
+        // Nose pad
+        const pad=new THREE.Mesh(new THREE.SphereGeometry(.008,8,6),glassFr);
+        pad.position.set(s*.022,-.026,GZ+.006); headG.add(pad);
+    });
+    // Bridge
+    const bridge=new THREE.Mesh(new THREE.BoxGeometry(.068,.01,.014),glassFr);
+    bridge.position.set(0,-.01,.222); headG.add(bridge);
+}
+
+// ─── LIGHTING ────────────────────────────────────────────────
+let screenLit;
+function buildLighting(){
+    // Ambient — warm base
+    scene.add(new THREE.AmbientLight(0x2a2040,.82));
+    // Hemisphere — ceiling bounce
+    scene.add(new THREE.HemisphereLight(0xffe8c8,0x1a2050,.72));
+
+    // Pendant lights (ceiling)
+    const ceil1=new THREE.PointLight(0xfff0d0,3.5,10);
+    ceil1.position.set(0,10.8,-.5); ceil1.castShadow=true;
+    ceil1.shadow.mapSize.set(1024,1024); scene.add(ceil1);
+    const ceil2=new THREE.PointLight(0xffe8c0,2.2,9);
+    ceil2.position.set(-4.5,10.8,-2); scene.add(ceil2);
+
+    // Bedside lamp
+    const bedLamp=new THREE.PointLight(0xffd080,2.8,7);
+    bedLamp.position.set(5.5,3.2,5.5); scene.add(bedLamp);
+
+    // Screen key light
+    screenLit=new THREE.PointLight(0x88d8ff,5.2,11);
+    screenLit.position.set(0,2.7,1.4); scene.add(screenLit);
+
+    // Cool rim from back-left
+    const rim=new THREE.PointLight(0x7a88ff,2.8,14);
+    rim.position.set(-4,5.8,-1); scene.add(rim);
+
+    // Window daylight — from right back
+    const daylight=new THREE.DirectionalLight(0xb8d8ff,.85);
+    daylight.position.set(6,8,-7); daylight.castShadow=true;
+    daylight.shadow.mapSize.set(2048,2048);
+    daylight.shadow.camera.left=-14; daylight.shadow.camera.right=14;
+    daylight.shadow.camera.top=14; daylight.shadow.camera.bottom=-10;
+    scene.add(daylight);
+
+    // Warm fill from right
+    const warmFill=new THREE.PointLight(0xffb050,1.8,12);
+    warmFill.position.set(9,4.5,1.5); scene.add(warmFill);
+
+    // Monitor wall glow
+    const monGlow=new THREE.PointLight(0xa0e8ff,.9,7);
+    monGlow.position.set(0,2.7,-.6); scene.add(monGlow);
+}
+
+// ─── PARTICLES — STEAM & DUST ────────────────────────────────
+const N_STEAM=28;
+let steamGeo,steamPos,steamVel=[],steamPhase=[];
+function buildSteam(){
+    steamGeo=new THREE.BufferGeometry();
+    steamPos=new Float32Array(N_STEAM*3);
+    for(let i=0;i<N_STEAM;i++){
+        steamPos[i*3]=1.7+(Math.random()-.5)*.08;
+        steamPos[i*3+1]=1.3+Math.random()*.3;
+        steamPos[i*3+2]=.15+(Math.random()-.5)*.06;
+        steamVel.push((Math.random()-.5)*.003,.005+Math.random()*.007,(Math.random()-.5)*.003);
+        steamPhase.push(Math.random()*Math.PI*2);
+    }
+    steamGeo.setAttribute('position',new THREE.BufferAttribute(steamPos,3));
+    const pm=new THREE.PointsMaterial({color:0xffffff,size:.026,transparent:true,opacity:.22,sizeAttenuation:true});
+    root.add(new THREE.Points(steamGeo,pm));
+}
+
+const N_DUST=180;
+let dustGeo,dustPos,dustVel=[];
+function buildDust(){
+    dustGeo=new THREE.BufferGeometry();
+    dustPos=new Float32Array(N_DUST*3);
+    for(let i=0;i<N_DUST;i++){
+        dustPos[i*3]=(Math.random()-.5)*18;
+        dustPos[i*3+1]=Math.random()*9;
+        dustPos[i*3+2]=(Math.random()-.5)*14;
+        dustVel.push((Math.random()-.5)*.004,.0015+Math.random()*.004,(Math.random()-.5)*.004);
+    }
+    dustGeo.setAttribute('position',new THREE.BufferAttribute(dustPos,3));
+    const dm=new THREE.PointsMaterial({color:0xd0e8ff,size:.022,transparent:true,opacity:.14,sizeAttenuation:true});
+    root.add(new THREE.Points(dustGeo,dm));
+}
+
+// ─── INPUT ───────────────────────────────────────────────────
 document.addEventListener('keydown',e=>{
-  if(e.keyCode===KON[ki]){ki++;if(ki===KON.length){alert('🌸 さくら！Konami code activé !');ki=0}}
-  else ki=0;
+    const k=e.key.toLowerCase();
+    if(k==='w'||k==='arrowup') keys.w=true;
+    if(k==='a'||k==='arrowleft') keys.a=true;
+    if(k==='s'||k==='arrowdown') keys.s=true;
+    if(k==='d'||k==='arrowright') keys.d=true;
 });
+document.addEventListener('keyup',e=>{
+    const k=e.key.toLowerCase();
+    if(k==='w'||k==='arrowup') keys.w=false;
+    if(k==='a'||k==='arrowleft') keys.a=false;
+    if(k==='s'||k==='arrowdown') keys.s=false;
+    if(k==='d'||k==='arrowright') keys.d=false;
+});
+document.addEventListener('mousemove',e=>{
+    mouse.x=(e.clientX/window.innerWidth)*2-1;
+    mouse.y=-(e.clientY/window.innerHeight)*2+1;
+    if(mouse.down&&!animating&&!entered){
+        camTheta-=(e.clientX-mouse.lx)*.003;
+        camPhi-=(e.clientY-mouse.ly)*.003;
+        camPhi=Math.max(.04,Math.min(.62,camPhi));
+    }
+    mouse.lx=e.clientX; mouse.ly=e.clientY;
+    const cur=document.getElementById('cur'),ring=document.getElementById('cur-ring');
+    cur.style.left=e.clientX+'px'; cur.style.top=e.clientY+'px';
+    ring.style.left=e.clientX+'px'; ring.style.top=e.clientY+'px';
+});
+document.addEventListener('mousedown',e=>{mouse.down=true;mouse.lx=e.clientX;mouse.ly=e.clientY;});
+document.addEventListener('mouseup',()=>mouse.down=false);
+document.addEventListener('wheel',e=>{
+    if(animating||entered) return;
+    camDist=Math.max(3.5,Math.min(22,camDist+e.deltaY*.012));
+},{passive:true});
+
+const raycaster=new THREE.Raycaster();
+const mVec=new THREE.Vector2();
+document.addEventListener('click',()=>{
+    if(animating||entered||!screenMesh) return;
+    mVec.set(mouse.x,mouse.y);
+    raycaster.setFromCamera(mVec,camera);
+    if(raycaster.intersectObject(screenMesh).length>0) triggerEntry();
+});
+
+// ─── ENTRY TRANSITION ────────────────────────────────────────
+function triggerEntry(){
+    if(animating||entered) return;
+    animating=true;
+    ['nametag','controls','speed'].forEach(id=>document.getElementById(id).classList.remove('show'));
+    document.getElementById('click-hint').classList.remove('show');
+    document.getElementById('portfolio-frame').src='index.html?from=intro3d';
+    doZoom();
+}
+function easeInOutQuart(t){return t<.5?8*t*t*t*t:1-Math.pow(-2*t+2,4)/2;}
+function easeInQuint(t){return t*t*t*t*t;}
+function doZoom(){
+    const MZ=-.55,MY=DH+.05+.62;
+    const portal=document.getElementById('portal');
+    const endPos=new THREE.Vector3(0,MY,MZ+1.62);
+    const startPos=camera.position.clone();
+    const startLook=camLookCur.clone();
+    const endLook=new THREE.Vector3(0,MY,MZ);
+    const DUR_A=1900,DUR_D=1250,t0=performance.now();
+    const baseFov=camera.fov;
+    function step(ts){
+        const e=ts-t0;
+        const ar=Math.min(e/DUR_A,1);
+        if(ar<1){
+            const p=easeInOutQuart(ar);
+            camera.position.lerpVectors(startPos,endPos,p);
+            camera.lookAt(new THREE.Vector3().lerpVectors(startLook,endLook,p));
+            if(screenMat) screenMat.emissiveIntensity=.75+p*2.5;
+            if(screenLit) screenLit.intensity=3.2+p*10;
+            portal.style.opacity=(p*.45).toFixed(3);
+            requestAnimationFrame(step); return;
+        }
+        const dr=Math.min((e-DUR_A)/DUR_D,1),pd=easeInQuint(dr);
+        camera.position.z=endPos.z-pd*1.5;
+        camera.position.y=endPos.y+pd*.04;
+        camera.lookAt(endLook);
+        camera.fov=baseFov+pd*30; camera.updateProjectionMatrix();
+        if(screenMat) screenMat.emissiveIntensity=3.2+pd*4.5;
+        if(screenLit) screenLit.intensity=13+pd*14;
+        portal.style.opacity=(.45+pd*.55).toFixed(3);
+        if(dr<1) requestAnimationFrame(step);
+        else{ camera.fov=baseFov; camera.updateProjectionMatrix(); finishEntry(); }
+    }
+    requestAnimationFrame(step);
+}
+function finishEntry(){
+    const frame=document.getElementById('portfolio-frame');
+    const flash=document.getElementById('flash'),portal=document.getElementById('portal');
+    flash.style.opacity='.6';
+    setTimeout(()=>{flash.style.opacity='0';},180);
+    portal.style.opacity='1';
+    setTimeout(()=>{
+        frame.style.opacity='1'; frame.style.pointerEvents='auto';
+        setTimeout(()=>{
+            canvas.style.transition='opacity .6s ease'; canvas.style.opacity='0';
+            portal.style.transition='opacity .65s ease'; portal.style.opacity='0';
+            ['vig','corners','cur','cur-ring'].forEach(id=>document.getElementById(id).style.display='none');
+            setTimeout(()=>{canvas.style.display='none';entered=true;animating=false;},600);
+        },600);
+    },480);
+}
+
+// ─── UPDATE ──────────────────────────────────────────────────
+function updateCam(dt){
+    if(animating||entered) return;
+    let spd=0;
+    if(keys.w){camDist-=6*dt;spd=65;}
+    if(keys.s){camDist+=6*dt;spd=32;}
+    if(keys.a){camTheta-=1.5*dt;spd=45;}
+    if(keys.d){camTheta+=1.5*dt;spd=45;}
+    camDist=Math.max(3.5,Math.min(22,camDist));
+    const tPhi=Math.max(.04,Math.min(.62,camPhi-mouse.y*.08));
+    const tTheta=camTheta+mouse.x*.15;
+    camera.position.set(
+        camDist*Math.sin(tTheta)*Math.cos(tPhi),
+        camDist*Math.sin(tPhi)+1.6,
+        camDist*Math.cos(tTheta)*Math.cos(tPhi)
+    );
+    camLookCur.lerp(CAM_LOOK,.055);
+    camera.lookAt(camLookCur);
+    speedDisplay+=(spd-speedDisplay)*5*dt;
+    document.getElementById('spv').textContent=speedDisplay.toFixed(1);
+}
+
+function checkHover(){
+    if(animating||entered||!screenMesh) return;
+    mVec.set(mouse.x,mouse.y);
+    raycaster.setFromCamera(mVec,camera);
+    const hit=raycaster.intersectObject(screenMesh).length>0;
+    if(hit!==hovering){
+        hovering=hit;
+        const cur=document.getElementById('cur'),ring=document.getElementById('cur-ring'),hint=document.getElementById('click-hint');
+        cur.classList.toggle('hover',hit); ring.classList.toggle('hover',hit);
+        hint.classList.toggle('show',hit);
+    }
+}
+
+function updateIdle(dt){
+    clock+=dt;
+    const t=clock;
+
+    // ── BLINK system ──
+    blinkTimer-=dt;
+    if(blinkTimer<=0){
+        blinkTimer=3+Math.random()*3.5;
+        blinkState=1;
+    }
+    if(eyeScaleL&&eyeScaleR&&blinkState!==0){
+        if(blinkState===1){
+            eyeScaleL.scale.y=Math.max(0.05, eyeScaleL.scale.y-dt*18);
+            eyeScaleR.scale.y=eyeScaleL.scale.y;
+            if(eyeScaleL.scale.y<=0.06) blinkState=2;
+        } else if(blinkState===2){
+            eyeScaleL.scale.y=Math.min(1, eyeScaleL.scale.y+dt*11);
+            eyeScaleR.scale.y=eyeScaleL.scale.y;
+            if(eyeScaleL.scale.y>=0.98){ blinkState=0; eyeScaleL.scale.y=1; eyeScaleR.scale.y=1; }
+        }
+    }
+
+    // Breathing head bob
+    if(headG){
+        headG.position.y=2.32+Math.sin(t*.78)*.005;
+        headG.rotation.y=Math.sin(t*.28)*.04-.02;
+        headG.rotation.x=Math.sin(t*.35)*.01+.015;
+        headG.rotation.z=Math.sin(t*.55)*.008;
+    }
+    if(torsoM){
+        torsoM.scale.y=1+Math.sin(t*.78)*.012;
+        torsoM.rotation.z=Math.sin(t*1.05)*.01;
+    }
+    // Right hand — mouse movement (fluid)
+    if(rightForeArm&&rightHandM){
+        rightForeArm.rotation.x=.72+Math.sin(t*4.8)*.1;
+        rightForeArm.rotation.z=.06+Math.sin(t*2.9)*.028;
+        rightHandM.position.x=.215+Math.sin(t*4.8)*.02;
+        rightHandM.position.y=1.0+Math.cos(t*4.8)*.015;
+        rightHandM.position.z=.78+Math.sin(t*4.8)*.01;
+    }
+    // Left hand — typing
+    if(leftForeArm&&leftHandM&&leftUpperArm){
+        const typingActive=Math.sin(t*.4)>.2;
+        leftUpperArm.rotation.z=.14+Math.sin(t*5.8)*.038;
+        leftForeArm.rotation.x=.86+Math.sin(t*(typingActive?9.2:1.5))*.1;
+        leftHandM.position.y=1.01+Math.sin(t*(typingActive?9.2:1))*.022;
+        leftHandM.position.z=.72+Math.cos(t*(typingActive?7.5:1))*.016;
+    }
+    // Mouse wiggle
+    if(mouseMesh){
+        mouseMesh.position.x=1.22+Math.sin(t*4.8)*.024;
+        mouseMesh.rotation.y=Math.sin(t*4.8)*.08;
+    }
+    // Screen flicker
+    if(screenMat&&!animating){
+        const fl=.72+Math.sin(t*52)*.014+Math.sin(t*38)*.008;
+        screenMat.emissiveIntensity=fl;
+        if(screenLit) screenLit.intensity=hovering?7.0:(3.2+Math.sin(t*1.1)*.25);
+    }
+}
+
+function updateSteam(){
+    if(!steamGeo) return;
+    for(let i=0;i<N_STEAM;i++){
+        const i3=i*3;
+        steamPos[i3]+=steamVel[i3]+Math.sin(clock*.6+steamPhase[i])*.0014;
+        steamPos[i3+1]+=steamVel[i3+1];
+        steamPos[i3+2]+=steamVel[i3+2];
+        if(steamPos[i3+1]>1.88){steamPos[i3]=1.7+(Math.random()-.5)*.08;steamPos[i3+1]=1.3;steamPos[i3+2]=.15+(Math.random()-.5)*.06;}
+    }
+    steamGeo.attributes.position.needsUpdate=true;
+}
+
+function updateDust(){
+    if(!dustGeo) return;
+    for(let i=0;i<N_DUST;i++){
+        const i3=i*3;
+        dustPos[i3]+=dustVel[i3]+Math.sin(clock*.22+i)*.0003;
+        dustPos[i3+1]+=dustVel[i3+1];
+        dustPos[i3+2]+=dustVel[i3+2];
+        if(dustPos[i3+1]>9){dustPos[i3]=(Math.random()-.5)*18;dustPos[i3+1]=0;dustPos[i3+2]=(Math.random()-.5)*14;}
+    }
+    dustGeo.attributes.position.needsUpdate=true;
+}
+
+window.addEventListener('resize',()=>{
+    camera.aspect=window.innerWidth/window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth,window.innerHeight);
+});
+
+// ─── BOOT ────────────────────────────────────────────────────
+function boot(){
+    load(0,0);
+    setTimeout(()=>{buildRoom();load(22,1);},80);
+    setTimeout(()=>{buildDesk();load(38,1);},200);
+    setTimeout(()=>{buildMonitor();buildKeyboard();buildMouse();buildDeskItems();load(60,2);},360);
+    setTimeout(()=>{buildChair();buildChar();load(76,3);},560);
+    setTimeout(()=>{buildLighting();load(88,4);},740);
+    setTimeout(()=>{buildSteam();buildDust();load(97,5);},920);
+    setTimeout(()=>{load(100,5);startLoop();},1150);
+}
+
+function startLoop(){
+    let last=performance.now();
+    function loop(ts){
+        requestAnimationFrame(loop);
+        const dt=Math.min((ts-last)/1000,.05); last=ts;
+        if(!entered){
+            drawScreen(ts);
+            if(screenTex) screenTex.needsUpdate=true;
+            updateCam(dt);
+            updateIdle(dt);
+            updateSteam();
+            updateDust();
+            checkHover();
+        }
+        renderer.render(scene,camera);
+    }
+    loop(performance.now());
+}
+
+boot();
+})();
 </script>
 </body>
 </html>
